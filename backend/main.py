@@ -8,7 +8,6 @@ from logging.handlers import TimedRotatingFileHandler
 from api.routers import v1
 import init
 
-
 # Fix middleware error in fastapi
 middleware =[
     Middleware(CORSMiddleware,
@@ -26,7 +25,6 @@ app = FastAPI(title=config.PROJECT_NAME,
               openapi_url="/api/openapi.json", 
               docs_url="/api/docs", 
               redoc_url="/api/redoc")
-
 
 # Handle Logs API
 formatter = logging.Formatter(

@@ -1,5 +1,5 @@
 pytz==2022.2.1
 fastapi==0.85.0
-fastapi_chameleon==0.1.12
+Jinja2==3.1.2
 uvicorn==0.18.3
 redislite==6.2.805324
