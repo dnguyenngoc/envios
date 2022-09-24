@@ -48,13 +48,12 @@ export default memo(
 
           var requestIds  = []
           status.forEach((item, i) => {requestIds.push(infos[i].RequestId)})
-          console.log("Request_IDs:", requestIds)
+          // console.log("Request_IDs:", requestIds)
 
           await apiRestoreService.GetStatusList(requestIds)
           .then(res => { 
             res.data.map((item, i) => {
               stemp[i] = item.status.general
-              console.log(item)
               slogs[i] = item.logs.at(-1)
               
               if (item.status.general === 'success') {
@@ -76,6 +75,7 @@ export default memo(
 
           if (stemp.every(isDone)) {
             clearInterval(ref.current) // Stop the interval if the condition holds true
+            setRunning(0)
 
           }
         }, 7000);
