@@ -1,6 +1,6 @@
+# 1. Install Libimobile
 sudo apt-get update
 sudo apt-get upgrade -y
-
 
 sudo apt-get install -y libcurl4-openssl-dev libplist-dev libzip-dev openssl libssl-dev libusb-1.0-0-dev \
         libreadline-dev build-essential git make automake libtool pkg-config git
@@ -13,12 +13,20 @@ git clone https://github.com/libimobiledevice/libirecovery
 git clone https://github.com/libimobiledevice/idevicerestore
 git clone https://github.com/libimobiledevice/libimobiledevice
 
-cd libimobiledevice-glue && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd libplist && ./autogen.sh && ./configure --prefix=/usr && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd libusbmuxd && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd libimobiledevice && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd usbmuxd && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd libirecovery && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
-cd idevicerestore && ./autogen.sh && ./configure && sudo make install && sudo ldconfig && cd ..
+cd libimobiledevice-glue && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd libplist && ./autogen.sh && ./configure && ./configure && sudo make install && sudo cd ..
+cd libusbmuxd && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd libimobiledevice && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd usbmuxd && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd libirecovery && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd idevicerestore && ./autogen.sh && ./configure && sudo make install && sudo cd ..
 
-sudo ldconfig
+# sudo ldconfig
+
+## 2. Install requirement python
+pip3 install -r ./backend/requirements.txt
+
+## 3. Install requirement Nodejs
+cd frontend && npm install
+
+
