@@ -51,19 +51,13 @@ def kill_process(pid):
 
 
 @router.post('/remove-all-bg/')
-def remove_background(
-    data: Status,
-):
+def remove_background(filter: str = 'idevicerestore'):
     try:  
-        data = sh.grep(sh.ps("ax"), 'idevicerestore')
+        data = sh.grep(sh.ps("ax"), filter)
         for item in data:
             pid =int(item.split(' ')[0])
             kill_process(pid)
-        return {
-            "detail": data
-        }
+        return {"detail": data}
     except Exception as e:
         print(e)
-        return {
-            "detail": 'all process have been closed!'
-        }
+        return {"detail": 'all process have been closed!'}
