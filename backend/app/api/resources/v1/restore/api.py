@@ -6,7 +6,9 @@ import json
 from init import redis
 from api.resources.v1.restore.bg import restore_process
 from api.entities.v1.restore import Status
-import subprocess
+import sh
+import signal
+import os
 
 
 router = APIRouter()
@@ -44,14 +46,24 @@ def status(data: Status):
     return result
 
 
+def kill_process(pid):
+    os.killpg(os.getpgid(pid), signal.SIGTERM)  
+
+
 @router.post('/remove-all-bg/')
 def remove_background(
     data: Status,
 ):
-    for request_id in data.requests:
-        rst = subprocess.Popen(["ps ax | grep" + " {}".format(request_id)], stdout=subprocess.PIPE)
-        stdout = rst.stdout
-        result = []
-        for line in stdout:
-            _str = line.decode('utf-8')
-            print(_str)
+    try:  
+        data = sh.grep(sh.ps("ax"), 'idevicerestore')
+        for item in data:
+            pid =int(item.split(' ')[0])
+            kill_process(pid)
+        return {
+            "detail": data
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "detail": 'all process have been closed!'
+        }
