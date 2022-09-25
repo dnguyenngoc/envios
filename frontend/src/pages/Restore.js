@@ -3,6 +3,7 @@ import { Button, Alert } from 'antd';
 import BackGround from '../assets/images/bg/2.png'
 import Device from './restore/Device';
 import * as apiDeviceService from '../services/Device'
+import * as apiRestoreService from '../services/Restore'
 import SpinLoading from '../components/loadings/SpinLoading';
 
 
@@ -47,12 +48,12 @@ const Restore = () => {
     }
 
     const funcStopAllProcess = () => {
-        setInfos([])
-        setIds([])
-        setLoading(false)
-        setGetDevicesButton(false)
-        setMessage(null)
-        setInterval(false)
+      apiRestoreService.StopAllProcess('idevicerestore')
+      setInfos([])
+      setIds([])
+      setLoading(false)
+      setGetDevicesButton(false)
+      setMessage(null)
     }
     
     return (

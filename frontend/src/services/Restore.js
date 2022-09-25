@@ -55,3 +55,14 @@ export async function GetStatusList(requestIds){
         console.log(e)
       }
 }
+
+export function StopAllProcess(filter){
+  var config = {
+    method: 'post',
+    url: BASE_URL +  `v1/restore/remove-all-bg/?filter=${filter}`,
+    headers: { 
+      'Content-Type': 'application/json'
+    },
+  }
+  axios(config);
+}

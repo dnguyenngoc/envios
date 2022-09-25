@@ -1,6 +1,6 @@
 
 # import
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from utils.time import now_utc
 import json
 from init import redis
@@ -52,6 +52,14 @@ def kill_process(pid):
 
 @router.post('/remove-all-bg/')
 def remove_background(filter: str = 'idevicerestore'):
+    checks = {
+        'idevicerestore': True
+    }
+    try:
+        if checks[filter] == False:
+            raise HTTPException(status_code=400, detail='filter not support!')
+    except:
+        raise HTTPException(status_code=400, detail='filter not support!')
     try:  
         data = sh.grep(sh.ps("ax"), filter)
         for item in data:
