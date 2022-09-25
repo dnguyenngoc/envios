@@ -1,0 +1,24 @@
+sudo apt-get update
+sudo apt-get upgrade -y
+
+
+sudo apt-get install -y libcurl4-openssl-dev libplist-dev libzip-dev openssl libssl-dev libusb-1.0-0-dev \
+        libreadline-dev build-essential git make automake libtool pkg-config git
+
+git clone https://github.com/libimobiledevice/libimobiledevice-glue
+git clone https://github.com/libimobiledevice/libplist
+git clone https://github.com/libimobiledevice/libusbmuxd
+git clone https://github.com/libimobiledevice/usbmuxd
+git clone https://github.com/libimobiledevice/libirecovery
+git clone https://github.com/libimobiledevice/idevicerestore
+git clone https://github.com/libimobiledevice/libimobiledevice
+
+cd libimobiledevice-glue && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd libplist && ./autogen.sh && ./configure --prefix=/usr && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd libusbmuxd && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd libimobiledevice && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd usbmuxd && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd libirecovery && ./autogen.sh && ./configure --prefix=/usr && sudo make install && sudo ldconfig && cd ..
+cd idevicerestore && ./autogen.sh && ./configure && sudo make install && sudo ldconfig && cd ..
+
+sudo ldconfig
