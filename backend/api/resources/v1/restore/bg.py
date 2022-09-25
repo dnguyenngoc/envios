@@ -6,66 +6,90 @@ import time
 import subprocess
 
 
+# print('{} - [Restore] r: {}, d: {}'.format(now_utc(), request_id, device_id))
+# for i in range(4):
+#     if i == 0:
+#         redis.set(request_id, json.dumps(data))
+#         time.sleep(10)
+#     elif i == 1:
+#         data['logs'].append('start verify os ....')
+#         data['status']['dowload_os']= 'success'
+#         data['status']['verify_os']= 'pending'
+#         redis.set(request_id, json.dumps(data))
+#         time.sleep(10)
+#     elif i == 2:
+#         data['logs'].append('start restore os ....')
+#         data['status']['verify_os']= 'success'
+#         data['status']['restore']= 'pending'
+#         redis.set(request_id, json.dumps(data))
+#         time.sleep(10)
+#     elif i == 3:
+#         data['logs'].append('completed!')
+#         data['status']['restore']= 'success'
+#         data['status']['general']= 'success'
+#         redis.set(request_id, json.dumps(data))
 def restore_process(request_id: str, device_id: str):
     data = {
             'request_id': request_id,
             'device_id': device_id,
             'times':{
-                'start_dowload_os': now_utc().timestamp(),
-                'end_dowload_os': now_utc().timestamp(),
-                'start_verify_os': now_utc().timestamp(),
-                'end_verify_os': now_utc().timestamp(),
-                'start_restore_os': now_utc().timestamp(),
-                'end_restore_os': now_utc().timestamp(),
+                'start': now_utc().timestamp(),
+                'end': None,
             },
             'status':{
                 'general': 'pending',
                 'dowload_os': 'pending',
                 'verify_os': None,
+                'extracting_filesystem': None,
+                'sending_filesystem': None,
                 'restore': None
             },
-            'logs': ["start dowloading os ...."],
-            'error': None
+            'logs': ["run cmd idevicerestore -e -l -y -u {}".format(device_id)],
+            'error': []
     }
+    redis.set(request_id, json.dumps(data))
     
-    process = subprocess.Popen(["cat", "/etc/hosts"], stdout=subprocess.PIPE)
+    
+    process = subprocess.Popen(["idevicerestore", "-e","-l", "-y" ,"-u", "{}".format(device_id)], 
+                                stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+    
+    check_error = False
+    stop_loop = False
     while True:
+        print('[{}] in while loop ...'.format(request_id))
         output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
         if output:
             log = output.strip()
-            str_log = log.decode('utf8')
-            print(str_log)
-            print("\n")
-            time.sleep(1)
-            # print(data)
-            
+            print(log)
+            str_log = log.decode('utf-8')
+            if str_log.startswith("ERROR"):
+                check_error = True
+                data['error'].append(str_log)
+            elif str_log.startswith('Getting ApNonce in normal mode'):
+                data['status']['dowload_os'] = 'success'
+                data['status']['verify_os'] = 'success'
+                data['status']['extracting_filesystem'] = 'success'
+            elif str_log.startswith('Done sending filesystem'):
+                data['status']['sending_filesystem'] = 'success'
+            elif str_log.startswith('Status: Restore Finished') or str_log.startswith('DONE'):
+                data['status']['restore'] = 'success'
+                stop_loop = True
+            data['logs'].append(str_log)
+            redis.set(request_id, json.dumps(data))
+            print('[{}] {}'.format(request_id, str_log))
+            if check_error or stop_loop:
+                break
     process.poll()
+
+    if check_error:
+        data['status']['general'] = 'failed'
+    elif stop_loop:
+        data['status']['general'] = 'success'
+    data['times']['end'] = now_utc().timestamp()
+    redis.set(request_id, json.dumps(data))
+    print('[{}] Done!'.format(request_id))
+
         
-    # print('{} - [Restore] r: {}, d: {}'.format(now_utc(), request_id, device_id))
-    
-    # for i in range(4):
-    #     if i == 0:
-    #         redis.set(request_id, json.dumps(data))
-    #         time.sleep(10)
-    #     elif i == 1:
-    #         data['logs'].append('start verify os ....')
-    #         data['status']['dowload_os']= 'success'
-    #         data['status']['verify_os']= 'pending'
-    #         redis.set(request_id, json.dumps(data))
-    #         time.sleep(10)
-    #     elif i == 2:
-    #         data['logs'].append('start restore os ....')
-    #         data['status']['verify_os']= 'success'
-    #         data['status']['restore']= 'pending'
-    #         redis.set(request_id, json.dumps(data))
-    #         time.sleep(10)
-    #     elif i == 3:
-    #         data['logs'].append('completed!')
-    #         data['status']['restore']= 'success'
-    #         data['status']['general']= 'success'
-    #         redis.set(request_id, json.dumps(data))
             
             
             

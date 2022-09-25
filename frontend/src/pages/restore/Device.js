@@ -14,12 +14,12 @@ export default memo(
     const styles = {
       device: {boxShadow: 'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px',
                height: '100px', width: '100%', marginTop: '30px', display: 'inline-flex', padding: '5px 5px'},
-      deviceInfo: {display: 'block', width: '20%', listStyleType: 'none',},
+      deviceInfo: {display: 'block', width: '20%', listStyleType: 'none'},
       restoreLogs: {marginRight: '35px', marginLeft: '15px', display: 'block', width: '60%'},
       restoreStatus: {width: '20%',marginRight: '25px',textAlign: 'center',alignItems: 'center',display: 'flex'},
       button: {marginRight: '30px'},
       siconStatus: {width: '20px',},
-      info:{fontSize: '12px', padding: '0px 10px'}
+      info:{fontSize: '10px', padding: '0px 10px'}
     }
     
     // Status of button
@@ -47,7 +47,7 @@ export default memo(
           
 
           var requestIds  = []
-          status.forEach((item, i) => {requestIds.push(infos[i].RequestId)})
+          status.forEach((item, i) => {requestIds.push(infos[i].RequestID)})
           // console.log("Request_IDs:", requestIds)
 
           await apiRestoreService.GetStatusList(requestIds)
@@ -59,7 +59,7 @@ export default memo(
               if (item.status.general === 'success') {
                 sbtemp[i] = false
               }else if (item.status.general === 'failed'){
-                sbtemp[i] = true
+                sbtemp[i] = false
               }else{
                 sbtemp[i] = true
               }
@@ -88,7 +88,7 @@ export default memo(
     
     // trigger api to start restore
     async function funcRestore(i){
-      apiRestoreService.RunRestore(infos[i].DeviceId, infos[i].RequestId)
+      apiRestoreService.RunRestore(infos[i].DeviceId, infos[i].RequestID)
       .then(res => {
           let sTime = [...startTime]
           sTime[i] = res.time_request
@@ -131,6 +131,8 @@ export default memo(
               <li style={styles.info}><b>ActivationState:</b> {infos[i].ActivationState}</li>
               <li style={styles.info}><b>ProductVersion:</b> {infos[i].ProductVersion}</li>
               <li style={styles.info}><b>DeviceColor:</b> {infos[i].DeviceColor}</li>
+              <li style={styles.info}><b>RequestId:</b> {infos[i].RequestID}</li>
+
             </div>
             <div style={styles.restoreLogs}>
               <TextArea

@@ -6,6 +6,8 @@ import json
 from init import redis
 from api.resources.v1.restore.bg import restore_process
 from api.entities.v1.restore import Status
+import subprocess
+
 
 router = APIRouter()
 
@@ -43,5 +45,13 @@ def status(data: Status):
 
 
 @router.post('/remove-all-bg/')
-def remove_background():
-    return "need to complete this task"
+def remove_background(
+    data: Status,
+):
+    for request_id in data.requests:
+        rst = subprocess.Popen(["ps ax | grep" + " {}".format(request_id)], stdout=subprocess.PIPE)
+        stdout = rst.stdout
+        result = []
+        for line in stdout:
+            _str = line.decode('utf-8')
+            print(_str)

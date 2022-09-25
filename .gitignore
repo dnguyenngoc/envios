@@ -4,3 +4,4 @@ logs/
 redis.db
 redis.db.settings
 .DS_Store
+iPhone*
