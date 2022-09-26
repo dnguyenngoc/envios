@@ -6,8 +6,15 @@ This is project for handle restore Iphone.
 ## Run
 
 ```
-sh run.sh
+  sh run.sh
 ```
+
+## Stop
+
+```
+  sh stop.sh
+```
+
 
 ## Contact Us
 
