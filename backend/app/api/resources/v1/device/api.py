@@ -3,6 +3,7 @@ from fastapi import HTTPException
 import uuid
 from utils.time import now_utc
 import subprocess
+import sh
 
 
 router = APIRouter()
@@ -13,6 +14,7 @@ list_key = ['UniqueDeviceID', 'UniqueChipID', 'TimeZone', 'SerialNumber', 'Regio
 
 @router.get('/info/list')
 async def get_list_device():
+    print('[LIST-DEVICE]')
     rst = subprocess.Popen(["idevice_id"], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
     stdout  = rst.stdout
     data = []
@@ -21,6 +23,7 @@ async def get_list_device():
         if _str.__contains__("ERROR"):
             raise HTTPException(status_code=404, detail='Not found')
         device_id = _str.split()[0]
+        print('   - {}: get Info'.format(device_id))
         info = subprocess.Popen(["ideviceinfo", "-u", "{}".format(device_id)], stdout=subprocess.PIPE)
         stdout = info.stdout
         _data = {'DeviceId': device_id}
@@ -37,6 +40,7 @@ async def get_list_device():
         data.append(_data)
     if len(data) == 0:
         raise HTTPException(status_code=404, detail='Not Found')
+    print('\n')
     return data
 
 
