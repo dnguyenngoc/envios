@@ -66,6 +66,8 @@ def restore_process(request_id: str, device_id: str):
                 print('[{}] {}'.format(request_id, str_log))
                 if check_error or stop_loop:
                     break
+            else:
+                print("Dont have any output ..")
         process.poll()
 
         if check_error:

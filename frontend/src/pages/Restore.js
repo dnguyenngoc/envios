@@ -42,6 +42,9 @@ const Restore = () => {
             if (e.response.status === 404){
               setGetDevicesButton(false)
               setMessage('Device Not Found')
+            }else{
+              setGetDevicesButton(false)
+              setMessage('Backend Error')
             }
             setLoading(false)
         })
