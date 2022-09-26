@@ -42,7 +42,9 @@ def status(request_id: str):
 def status(data: Status):
     result = []
     for item in data.requests:
-        result.append(json.loads(redis.get(item)))
+        data = redis.get(item)
+        if data != None:
+            result.append(json.loads(data))
     return result
 
 
@@ -52,6 +54,7 @@ def kill_process(pid):
 
 @router.post('/remove-all-bg/')
 def remove_background(filter: str = 'idevicerestore'):
+    print('[REMOVE-BG]')
     checks = {
         'idevicerestore': True
     }
@@ -63,6 +66,7 @@ def remove_background(filter: str = 'idevicerestore'):
     try:  
         data = sh.grep(sh.ps("ax"), filter)
         for item in data:
+            print('  - kill:', item)
             pid =int(item.split(' ')[0])
             kill_process(pid)
         return {"detail": data}

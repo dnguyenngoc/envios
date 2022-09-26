@@ -3,7 +3,7 @@ from utils.time import now_utc
 from init import redis
 import json
 import subprocess
-
+import time
 
 def restore_process(request_id: str, device_id: str):
     data = {
@@ -25,6 +25,9 @@ def restore_process(request_id: str, device_id: str):
             'error': []
     }
     redis.set(request_id, json.dumps(data))
+    time.sleep(2)
+    data['logs'].append('dowload os .........')
+    redis.set(request_id, json.dumps(data))
     
     try:
         process = subprocess.Popen(["idevicerestore", "-e","-l", "-y" ,"-u", "{}".format(device_id)], 
@@ -32,14 +35,21 @@ def restore_process(request_id: str, device_id: str):
         
         check_error = False
         stop_loop = False
+        count= 0
         while True:
             print('[{}] in while loop ...'.format(request_id))
+            if count == 3:
+                data['error'].append('ERROR: Unable to receive message from FDR')
+                data['logs'].append('ERROR: Unable to receive message from FDR')
+                redis.set(request_id, json.dumps(data))
+                break
             output = process.stdout.readline()
             if output:
                 log = output.strip()
-                print(log)
                 str_log = log.decode('utf-8')
-                if str_log.startswith("ERROR"):
+                if str_log.startswith('ERROR: Unable to receive message from FDR'):
+                    count += 1
+                elif str_log.startswith("ERROR"):
                     check_error = True
                     data['error'].append(str_log)
                 elif str_log.startswith('Getting ApNonce in normal mode'):
@@ -65,6 +75,7 @@ def restore_process(request_id: str, device_id: str):
         data['times']['end'] = now_utc().timestamp()
         redis.set(request_id, json.dumps(data))
         print('[{}] Done!'.format(request_id))
+        
     except Exception as e:
         data['status']['general'] = 'failed'
         data['error'].append(str(e))
