@@ -78,7 +78,7 @@ export default memo(
             setRunning(0)
 
           }
-        }, 7000);
+        }, 13000);
       else clearInterval(ref.current); // Stop the interval if the condition holds true
       return () => {
         clearInterval(ref.current); // unmount coponent

@@ -5,3 +5,7 @@ redis.db
 redis.db.settings
 .DS_Store
 iPhone*
+backend/app/storage/**/*.pdf
+backend/app/storage/**/*.json
+
+!storage/.gitkeep
