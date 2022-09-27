@@ -94,7 +94,6 @@ def make_report(name, data, info_json):
     pdf.set_text_color(128)
     pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.multi_cell(0, 5, text_erasure)
-    pdf.ln()
     
     
     # Hardware
