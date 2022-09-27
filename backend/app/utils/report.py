@@ -1,7 +1,4 @@
-import imp
-from multiprocessing.spawn import import_main_path
 import fpdf
-import io
 from utils.time import timestamp_to_datetime
 
 
@@ -13,12 +10,11 @@ def create_erasure_info(data, json_data):
     start_end = str(timestamp_to_datetime(data['times']['start'])) + '/' + str(timestamp_to_datetime(data['times']['end']))
     data = """Previous OS: {previous_os}
 New OS: {new_os}
-Status: {status}
 Duration: {duration}s
 Start/End Time: {start_end}
-""".format(previous_os = previous_os, new_os = new_os, status=status, duration = duration, start_end = start_end)
-
-    return data
+""".format(previous_os = previous_os, new_os = new_os, duration = duration, start_end = start_end)
+    status = ['Status:', status]
+    return status, data
 
 
 def create_hardware_info(info_json):
@@ -42,11 +38,16 @@ def create_hardware_info(info_json):
     return data
 
 
-def make_report(name, data):
+def make_report(name, data, info_json):
     title = "Data Erasure Report"
     erasure_results_title = 'Erasure Results'
     hardware_detail_title = "Hardware Details"
-    battery_info_title = 'Battery Information'
+    # battery_info_title = 'Battery Information'
+    
+    # make data
+    status_erasure, text_erasure = create_erasure_info(data, info_json)
+    text_hardware = create_hardware_info(info_json)
+
 
     pdf = fpdf.FPDF()
     pdf.add_font("NotoSans", style="", fname=r"./fonts/NotoSans-Regular.ttf", uni=True)
@@ -54,29 +55,61 @@ def make_report(name, data):
     pdf.add_font("NotoSans", style="I", fname=r"./fonts/NotoSans-Italic.ttf", uni=True)
     pdf.add_font("NotoSans", style="BI", fname=r"./fonts/NotoSans-BoldItalic.ttf", uni=True)
     pdf.add_page()
+    
+    # logo
+    pdf.image('./images/logo.jpeg', 120, 10, 100)
 
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
     # title
     pdf.set_font('NotoSans', '', 22)
-    pdf.cell(0, 30, txt = title, ln = 1)
+    pdf.cell(0, 60, txt = title)
+    pdf.ln()
     
     # Erasure Results
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore-10)
     pdf.set_font('NotoSans', '', 13)
     pdf.cell(0, 10, txt = erasure_results_title)
     pdf.ln()
+    
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.set_text_color(128)
     pdf.set_font('NotoSans', '', 8)
-    pdf.multi_cell(0, 5, data['erasure'])
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
+    pdf.cell(0,5, status_erasure[0])
+    status_erasure[1] = 'SUCCESS'
+    if status_erasure[1] == 'SUCCESS': 
+        pdf.set_text_color(170,219,30)
+    else:
+        pdf.set_text_color(205,0,26)
+    pdf.set_xy(pdf.l_margin + 15, ybefore)
+    pdf.cell(0,5, status_erasure[1])
+    pdf.ln()
+    
+    
+    ybefore = pdf.get_y()
+    pdf.set_text_color(128)
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
+    pdf.multi_cell(0, 5, text_erasure)
     pdf.ln()
     
     
     # Hardware
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.set_font('NotoSans', '', 13)
     pdf.set_text_color(0)
-    pdf.cell(0, 10, txt = hardware_detail_title)
+    pdf.cell(0, 13, txt = hardware_detail_title)
     pdf.ln()
+    
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.set_text_color(128)
     pdf.set_font('NotoSans', '', 8)
-    pdf.multi_cell(0, 5, data['hardware_detail'])
+    pdf.multi_cell(0, 5, text_hardware)
     pdf.ln()
     
     # buf = io.StringIO(data['battery_info'])
