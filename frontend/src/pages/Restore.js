@@ -21,6 +21,10 @@ const Restore = () => {
     const [infos, setInfos] = useState([])
     const [ids, setIds] = useState([])
     const [getDevicesButton, setGetDevicesButton] = useState(false)
+    const [lockButtonAll, setLockButonAll] = useState(false)
+    const [lockButtonRemove, setLockButonRemove] = useState(true)
+
+
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState(null)
 
@@ -36,7 +40,6 @@ const Restore = () => {
             })
             setIds(ids)
             setLoading(false)
-
           })
           .catch(e => {
             if (e.response.status === 404){
@@ -51,14 +54,31 @@ const Restore = () => {
     }
 
     const funcStopAllProcess = () => {
+      setLoading(true)
       apiRestoreService.StopAllProcess('idevicerestore')
       setInfos([])
       setIds([])
       setLoading(false)
       setGetDevicesButton(false)
       setMessage(null)
+      setLoading(false)
     }
-    
+    const funcRemoveLogs = () => {
+      setLoading(true)
+      setInfos([])
+      setIds([])
+      setLoading(false)
+      setGetDevicesButton(false)
+      setMessage(null)
+      setLockButonRemove(true)
+      apiRestoreService.removeLogs()
+      setLoading(false)
+    }
+    const handleInprocess = (all) => {
+      setLockButonAll(all)
+      setLockButonRemove(all)
+    } 
+
     return (
         <div style={styles.page}>
 
@@ -66,7 +86,9 @@ const Restore = () => {
                 <div style={styles.titles}>
                     <h5 style={styles.title}>List of DEVICE</h5>
                     <Button disabled={getDevicesButton} onClick={funcGetDevices} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black'}}>Get Devices</Button>
-                    <Button onClick={funcStopAllProcess} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black', marginLeft: '20px'}}>Stop All Process</Button>
+                    <Button disabled={lockButtonAll} onClick={funcStopAllProcess} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black', marginLeft: '20px'}}>Stop All Process</Button>
+                    <Button disabled={lockButtonRemove} onClick={funcRemoveLogs} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black', marginLeft: '20px'}}>Remove Logs</Button>
+                    
                     {loading ?<div style={{paddingLeft: '30px', paddingTop: '5px'}}><SpinLoading/></div> : ''}
                     {message !== null ? <Alert message={message} type="warning" showIcon closable style={{marginLeft: '30px'}} /> : ""}
 
@@ -74,7 +96,8 @@ const Restore = () => {
                 {getDevicesButton === true ? 
                 <Device
                   ids={ids}
-                  infos={infos} 
+                  infos={infos}
+                  handleInprocess= {handleInprocess} 
                 />
                 : ""}
             </div>

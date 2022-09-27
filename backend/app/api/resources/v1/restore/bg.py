@@ -33,7 +33,7 @@ def restore_process(request_id: str, device_id: str):
     }
     redis.set(request_id, json.dumps(data))
     time.sleep(2)
-    data['logs'].append('dowload os .........')
+    data['logs'].append('Please wait until the firmware is downloaded, it may take a long time due to the network ...')
     redis.set(request_id, json.dumps(data))
     
     try:

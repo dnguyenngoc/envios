@@ -13,20 +13,23 @@ git clone https://github.com/libimobiledevice/libirecovery
 git clone https://github.com/libimobiledevice/idevicerestore
 git clone https://github.com/libimobiledevice/libimobiledevice
 
-cd libimobiledevice-glue && ./autogen.sh && ./configure && sudo make install && sudo cd ..
-cd libplist && ./autogen.sh && ./configure && ./configure && sudo make install && sudo cd ..
-cd libusbmuxd && ./autogen.sh && ./configure && sudo make install && sudo cd ..
-cd libimobiledevice && ./autogen.sh && ./configure && sudo make install && sudo cd ..
-cd usbmuxd && ./autogen.sh && ./configure && sudo make install && sudo cd ..
-cd libirecovery && ./autogen.sh && ./configure && sudo make install && sudo cd ..
-cd idevicerestore && ./autogen.sh && ./configure && sudo make install && sudo cd ..
+cd libimobiledevice-glue && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
+cd libplist && git pull && ./autogen.sh && ./configure && ./configure && sudo make install && cd ..
+cd libusbmuxd && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
+cd libimobiledevice && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
+cd usbmuxd && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
+cd libirecovery && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
+cd idevicerestore && git pull && ./autogen.sh && ./configure && sudo make install && cd ..
 
-# sudo ldconfig
+sudo ldconfig
+
 
 ## 2. Install requirement python
 pip3 install -r ./backend/requirements.txt
 
-## 3. Install requirement Nodejs
+## 3. Install Nodejs and npm dependency
+sudo apt install nodejs npm -y
 cd frontend && npm install
+
 
 

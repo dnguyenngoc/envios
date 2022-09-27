@@ -66,3 +66,14 @@ export function StopAllProcess(filter){
   }
   axios(config);
 }
+
+export function removeLogs(filter){
+  var config = {
+    method: 'post',
+    url: BASE_URL +  `v1/restore/remove-all-logs/`,
+    headers: { 
+      'Content-Type': 'application/json'
+    },
+  }
+  axios(config);
+}
