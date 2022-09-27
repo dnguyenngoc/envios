@@ -9,3 +9,11 @@ backend/app/storage/**/*.pdf
 backend/app/storage/**/*.json
 
 !storage/.gitkeep
+
+libplist
+libirecovery
+idevicerestore
+libimobiledevice
+libimobiledevice-glue
+libusbmuxd
+usbmuxd
