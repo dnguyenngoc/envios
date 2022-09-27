@@ -80,7 +80,7 @@ def make_report(name, data, info_json):
     ybefore = pdf.get_y()
     pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.cell(0,5, status_erasure[0])
-    status_erasure[1] = 'SUCCESS'
+    # status_erasure[1] = 'SUCCESS'
     if status_erasure[1] == 'SUCCESS': 
         pdf.set_text_color(170,219,30)
     else:
