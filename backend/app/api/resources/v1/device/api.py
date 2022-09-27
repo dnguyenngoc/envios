@@ -28,23 +28,28 @@ async def get_list_device():
         device_id = _str.split()[0]
         print('   - {}: get Info'.format(device_id))
         try:
-            info = subprocess.Popen(["ideviceinfo", "-u", "{}".format(device_id)], stdout=subprocess.PIPE)
+            info = subprocess.Popen(["ideviceinfo", "-u", "{}".format(device_id)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             stdout = info.stdout
-        except:
+        except Exception as e:
+            print(e)
             continue
         _data = {'DeviceId': device_id}
         start_time = now_utc().timestamp()
         request_id = str(uuid.uuid5(uuid.NAMESPACE_OID, "restore" + device_id + str(start_time)))
         _data['RequestID']= request_id
+        _check = True
         for line in stdout:
             _str = line.decode('utf-8')
+            if _str.startswith("ERROR"):
+                print(_str)
+                _check = False
             _str = _str.split(": ")
             key = _str[0]
             val = _str[1]
-            # if key in list_key:
             _data[key] = val.replace('\n', '')
-        save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
-        data.append(_data)
+        if _check == True:
+            save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
+            data.append(_data)
     if len(data) == 0:
         raise HTTPException(status_code=404, detail='Not Found')
     print('\n')

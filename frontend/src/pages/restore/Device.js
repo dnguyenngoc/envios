@@ -10,7 +10,7 @@ const { TextArea } = Input;
 
 
 export default memo(
-  function Device({ ids, infos}){
+  function Device({ ids, infos, handleInprocess}){
     const styles = {
       device: {boxShadow: 'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px',
                height: '100px', width: '100%', marginTop: '30px', display: 'inline-flex', padding: '5px 5px'},
@@ -36,15 +36,13 @@ export default memo(
       return element !== 'pending';
     }
 
-
     useEffect(() => {
-      if (running > 0)
+      if (running > 0){
+        handleInprocess(true)
         ref.current = setInterval(async() => { // Trigger each 7s to get status of request.
           let stemp = [...status]
           let sbtemp = [...statusB]
           let slogs = [...logs]
-
-          
 
           var requestIds  = []
           status.forEach((item, i) => {requestIds.push(infos[i].RequestID)})
@@ -72,18 +70,22 @@ export default memo(
           setStatus(stemp)
           setStatusB(sbtemp)
           setLogs(slogs)
-
+          
           if (stemp.every(isDone)) {
             clearInterval(ref.current) // Stop the interval if the condition holds true
             setRunning(0)
-
+            handleInprocess(false)
           }
         }, 13000);
-      else clearInterval(ref.current); // Stop the interval if the condition holds true
+      }
+      else {
+        clearInterval(ref.current); // Stop the interval if the condition holds true
+
+      }
       return () => {
         clearInterval(ref.current); // unmount coponent
       };
-    }, [running, infos, status, statusB, logs])
+    }, [running, infos, status, statusB, logs, handleInprocess])
 
     
     // trigger api to start restore
