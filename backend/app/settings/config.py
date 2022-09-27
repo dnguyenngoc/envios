@@ -11,3 +11,7 @@ u = datetime.datetime.utcnow()
 u = u.replace(tzinfo=pytz.timezone("Asia/Ho_Chi_Minh"))
 PROJECT_NAME = 'envios'
 CORS_MIDDLEWARE = '*'
+
+
+# Storage
+STORAGE_DEFAULT_PATH = './storage/'

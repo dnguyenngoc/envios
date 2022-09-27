@@ -9,6 +9,7 @@ from api.entities.v1.restore import Status
 import sh
 import signal
 import os
+import glob
 
 
 router = APIRouter()
@@ -73,3 +74,11 @@ def remove_background(filter: str = 'idevicerestore'):
     except Exception as e:
         print(e)
         return {"detail": 'all process have been closed!'}
+    
+@router.post('/remove-all-logs/')
+def remove_logs():
+    print(['REMOVE-LOGS'])
+    files = glob.glob('./storage/data_logs/*') + glob.glob('./storage/json/*')
+    for f in files:
+        os.remove(f)
+        print('   - Remove: %s' %f)

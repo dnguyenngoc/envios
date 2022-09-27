@@ -2,6 +2,11 @@ import datetime
 import pytz
 
 
+def timestamp_to_datetime(time):
+    dt_object = datetime.datetime.fromtimestamp(time)
+    return dt_object
+
+
 def now_utc():
     now = datetime.datetime.utcnow()
     now = now.replace(tzinfo=pytz.utc)
