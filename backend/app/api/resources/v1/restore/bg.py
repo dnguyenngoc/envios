@@ -1,9 +1,15 @@
+
 import json
+from utils.file import save_file
 from utils.time import now_utc
 from init import redis
 import json
 import subprocess
 import time
+from utils.report import make_report, create_hardware_info, create_erasure_info
+from utils.file import load_file
+from settings import config
+
 
 def restore_process(request_id: str, device_id: str):
     data = {
@@ -22,7 +28,8 @@ def restore_process(request_id: str, device_id: str):
                 'restore': None
             },
             'logs': ["run cmd idevicerestore -e -l -y -u {}".format(device_id)],
-            'error': []
+            'error': [],
+            'new_os': ''
     }
     redis.set(request_id, json.dumps(data))
     time.sleep(2)
@@ -52,6 +59,8 @@ def restore_process(request_id: str, device_id: str):
                 elif str_log.startswith("ERROR"):
                     check_error = True
                     data['error'].append(str_log)
+                elif str_log.startswith("Product Version:"):
+                    data['new_os'] = str_log.split(': ')[-1]
                 elif str_log.startswith('Getting ApNonce in normal mode'):
                     data['status']['dowload_os'] = 'success'
                     data['status']['verify_os'] = 'success'
@@ -84,8 +93,32 @@ def restore_process(request_id: str, device_id: str):
         data['logs'].append(str(e))
         data['times']['end'] = now_utc().timestamp()
         redis.set(request_id, json.dumps(data))
-
+    finally:
+        save_file(config.STORAGE_DEFAULT_PATH + 'data_logs/{}.json'.format(request_id + '_' + device_id), data)
+        print('[{}] Save logs file success'.format(request_id))
         
+        info = load_file(config.STORAGE_DEFAULT_PATH + '{type}/{name}.{type}'.format(type = 'json', name = request_id + '_' + device_id))
+        text_erasure = create_erasure_info(data, info)
+        text_hardware = create_hardware_info(info)
+        data = {}
+        data['erasure'] = text_erasure
+        data['hardware_detail'] = text_hardware
+        #         text_battery = """Serial:
+# Manufacturing Date:
+# Recharge Cycles:
+# Capacity:
+# Wear Level:
+# Charge Level:
+# Health Level:
+# Temperature:
+# Apple Health Metric:
+#         """
+        # data['battery_info'] = text_battery
+        make_report(info['SerialNumber'], data) 
+        print('[{}] Make report success'.format(request_id))
+        
+        
+                
             
             
             
