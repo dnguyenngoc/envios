@@ -16,7 +16,7 @@ Start/End Time: {start_end}
     if status == "SUCCESS":
         status = "ERASED"
     
-    status = "ERASED"
+    # status = "ERASED"
     
     status = ['Status:', status]
     return status, data
@@ -138,7 +138,7 @@ def make_report(name, data, info_json):
     
     ybefore = pdf.get_y()
     
-    pdf.set_text_color(0)
+    pdf.set_text_color(128)
     pdf.line(pdf.l_margin + 5, ybefore+20, pdf.l_margin+ 80, ybefore+20)
     pdf.line(pdf.l_margin + 100, ybefore+20, pdf.l_margin+ 160, ybefore+20)
     
