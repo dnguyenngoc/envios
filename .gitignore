@@ -17,3 +17,4 @@ libimobiledevice
 libimobiledevice-glue
 libusbmuxd
 usbmuxd
+fake_report.py

@@ -3,7 +3,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 sudo apt-get install -y libcurl4-openssl-dev libplist-dev libzip-dev openssl libssl-dev libusb-1.0-0-dev \
-        libreadline-dev build-essential git make automake libtool pkg-config git
+        libreadline-dev build-essential git make automake libtool pkg-config git python3-pip
 
 git clone https://github.com/libimobiledevice/libimobiledevice-glue
 git clone https://github.com/libimobiledevice/libplist
@@ -23,13 +23,15 @@ cd idevicerestore && git pull && ./autogen.sh && ./configure && sudo make instal
 
 sudo ldconfig
 
+## 2. Re-pull git repo
+git pull
 
-## 2. Install requirement python
+## 3. Install requirement python
 pip3 install -r ./backend/requirements.txt
 
-## 3. Install Nodejs and npm dependency
+## 4. Install Nodejs and npm dependency
 sudo apt install nodejs npm -y
-cd frontend && npm install
+cd frontend && npm install && cd ..
 
 
 
