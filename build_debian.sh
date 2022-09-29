@@ -3,7 +3,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 sudo apt-get install -y libcurl4-openssl-dev libplist-dev libzip-dev openssl libssl-dev libusb-1.0-0-dev \
-        libreadline-dev build-essential git make automake libtool pkg-config git python3-pip
+        libreadline-dev build-essential git make automake libtool pkg-config git python3-pip gunicorn
 
 git clone https://github.com/libimobiledevice/libimobiledevice-glue
 git clone https://github.com/libimobiledevice/libplist
