@@ -80,7 +80,7 @@ def make_report(name, data, info_json):
     pdf.set_xy(pdf.l_margin + 5, ybefore)
     # title
     pdf.set_font('NotoSans', '', 20)
-    pdf.cell(0, 50, txt = title)
+    pdf.cell(0, 40, txt = title)
     pdf.ln()
     
     # Erasure Results
