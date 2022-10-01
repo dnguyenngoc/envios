@@ -8,7 +8,8 @@ def create_erasure_info(data, json_data):
     status = data['status']['general'].upper()
     duration = data['times']['end'] - data['times']['start']
     start_end = str(timestamp_to_datetime(data['times']['start'])) + '/' + str(timestamp_to_datetime(data['times']['end']))
-    data = """Previous OS: {previous_os}
+    data = """Deletion Method: iOS Factory Reset
+Previous OS: {previous_os}
 New OS: {new_os}
 Duration: {duration}s
 Start/End Time: {start_end}
