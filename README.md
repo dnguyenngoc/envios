@@ -25,7 +25,7 @@ This is project for handle restore Iphone.
 ## Contact Us
 
 - Dev1: duynguyenngoc@hotmail.com - Duy Nguyen  :soccer: :christmas_tree: :basketball: *"Cuộc sống như một làn gió!"*
-- Dev2: kai-le@@hotmail.de - Kai Le  :fire: :fire: :fire:
+- Dev2: kai-le@hotmail.de - Kai Le  :fire: :fire: :fire:
 
 
 
