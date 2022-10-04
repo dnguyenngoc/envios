@@ -9,13 +9,13 @@ This is project for handle restore Iphone.
   sh build_debian.sh
 ```
 
-## 2. Run
+### 2. Run
 
 ```
   sh run_debian.sh
 ```
 
-## Stop
+### 3. Stop
 
 ```
   sh stop.sh
