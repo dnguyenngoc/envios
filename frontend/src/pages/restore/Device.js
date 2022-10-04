@@ -4,6 +4,8 @@ import Fail from '../../assets/images/svg/fail.svg'
 import SpinLoading from '../../components/loadings/SpinLoading'
 import { Button, Input} from 'antd';
 import * as apiRestoreService from '../../services/Restore';
+import * as apiDeviceService from '../../services/Device';
+
 
 
 const { TextArea } = Input;
@@ -22,13 +24,23 @@ export default memo(
       info:{fontSize: '10px', padding: '0px 10px'}
     }
     
+   
     // Status of button
-    const [statusB, setStatusB] = useState(ids.map(item=>  {return false}))
-    const [logs, setLogs] = useState(ids.map((item, i)=>  {return ''}))
-    const [status, setStatus] = useState(ids.map((item, i)=>  {return 'not-start'}))
+    const [statusB, setStatusB] = useState([])
+    const [mode, setMode] = useState([])
+    const [logs, setLogs] = useState([])
+    const [status, setStatus] = useState([])
     const [startTime, setStartTime] = useState([])
     const [running, setRunning] = useState(0)
 
+
+    // need change only one state if you want to increase performace
+    useEffect(() => {
+      setMode(ids.map(item => ('normal')));
+      setStatusB(ids.map(item => false));
+      setLogs(ids.map(item=> ('')));
+      setStatus(ids.map(item=> ('not-start')));
+    }, [ids]);
 
     let ref  = useRef(null);
 
@@ -116,6 +128,52 @@ export default memo(
       
     }
 
+    // const sleep = (milliseconds) => {
+    //   return new Promise(resolve => setTimeout(resolve, milliseconds))
+    // }
+
+    // function handle logs
+    function funcUpdateLog(i, message){
+      var tempLogs = [...logs]
+      tempLogs[i] = message
+      setLogs(tempLogs)
+    }
+
+    // Change mode
+    async function funcChangeMode(i){
+      var tempMode = [...mode]
+      var tempMode1 = [...mode]
+
+      tempMode1[i] = 'pending'
+      setMode(tempMode1)
+
+      if (tempMode[i] === 'normal' || tempMode[i] === 'dfu'){
+        const type = tempMode[i]
+        var runType = type
+        if (type === 'normal') runType ='dfu'
+        else runType = 'normal'
+
+        await apiDeviceService.ChangeMode(infos[i]['RequestID'], infos[i]['DeviceId'], runType)
+        .then(res => {
+          console.log(res)
+          if (res.status === 'success'){ 
+            tempMode[i] = res.type
+            funcUpdateLog(i, 'Device is successfully switching to ' + res.type )
+          }else {
+            tempMode[i] = type
+            funcUpdateLog(i, 'ERROR: Unable to discover device mode. Please make sure a device is attached.')
+          }
+        })
+        .catch(e=> {
+          tempMode[i] = type
+        })
+        .finally(e => {
+          setMode(tempMode)
+          }
+        )
+      }
+    }
+
     // Status of restore device
     const Status =(sta) => {
         if (sta === 'not-start' || sta === undefined) return <></>
@@ -145,6 +203,8 @@ export default memo(
               />
             </div>
             <div style={styles.restoreStatus}>
+                    <Button disabled={mode[i] === 'pending' || statusB[i] ? true : false} onClick={()=> funcChangeMode(i)} type="info" size='large' style={styles.button}>{mode[i]}</Button>
+
                     <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='large' style={styles.button}>Restore</Button>
                     {Status(status[i])}
                 </div>

@@ -19,3 +19,23 @@ export function GetDeviceList() {
     return dataPromise
 }
 
+
+// Change mode of device
+export function ChangeMode(requestId, deviceId, type){
+    var formData = new FormData()
+    formData.append('request_id', requestId)
+    formData.append('device_id', deviceId)
+    formData.append('type', type)
+    // console.log('formdata', formData)
+    var config = {
+        method: 'post',
+        url: BASE_URL + 'v1/device/mode/',
+        headers: { 
+        },
+        data : formData
+    };
+
+    const promise = axios(config)
+    const dataPromise = promise.then((response) => response.data)
+    return dataPromise
+}

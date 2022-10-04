@@ -12,9 +12,13 @@ from settings import config
 
 
 def restore_process(request_id: str, device_id: str):
+    json_path= config.STORAGE_DEFAULT_PATH + 'json/{}_{}.json'.format(request_id, device_id)
+    info = load_file(json_path)
+    chip_id = info['UniqueChipID']
     data = {
             'request_id': request_id,
             'device_id': device_id,
+            'chip_id': chip_id,
             'times':{
                 'start': now_utc().timestamp(),
                 'end': None,
@@ -27,7 +31,7 @@ def restore_process(request_id: str, device_id: str):
                 'sending_filesystem': None,
                 'restore': None
             },
-            'logs': ["run cmd idevicerestore -e -l -y -u {}".format(device_id)],
+            'logs': ["run cmd idevicerestore -e -l -y -e {}".format(chip_id)],
             'error': [],
             'new_os': ''
     }
@@ -37,7 +41,7 @@ def restore_process(request_id: str, device_id: str):
     redis.set(request_id, json.dumps(data))
     
     try:
-        process = subprocess.Popen(["idevicerestore", "-e","-l", "-y" ,"-u", "{}".format(device_id)], 
+        process = subprocess.Popen(["idevicerestore", "-e","-l", "-y" ,"-e", "{}".format(chip_id)], 
                                     stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
         
         check_error = False
