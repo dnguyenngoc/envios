@@ -11,10 +11,15 @@ from utils.file import load_file
 from settings import config
 
 
-def restore_process(request_id: str, device_id: str):
+def restore_process(request_id: str, device_id: str, report_name: str):
+    
     json_path= config.STORAGE_DEFAULT_PATH + 'json/{}_{}.json'.format(request_id, device_id)
     info = load_file(json_path)
     chip_id = info['UniqueChipID']
+    if report_name == '.pdf':
+        report_name = info['SerialNumber']
+    else:
+        report_name = report_name[:-4]
     data = {
             'request_id': request_id,
             'device_id': device_id,
@@ -101,8 +106,8 @@ def restore_process(request_id: str, device_id: str):
         save_file(config.STORAGE_DEFAULT_PATH + 'data_logs/{}.json'.format(request_id + '_' + device_id), data)
         print('[{}] Save logs file success'.format(request_id))
         info = load_file(config.STORAGE_DEFAULT_PATH + '{type}/{name}.{type}'.format(type = 'json', name = request_id + '_' + device_id))
-        make_report(info['SerialNumber'], data, info) 
-        print('[{}] Make report success'.format(request_id))
+        make_report(report_name, data, info) 
+        print('[{}] Make report {} success'.format(request_id, report_name+ '.pdf'))
         
         
                 

@@ -1,6 +1,7 @@
 
 # import
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from ast import For
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Form
 from utils.time import now_utc
 import json
 from init import redis
@@ -15,16 +16,18 @@ import glob
 router = APIRouter()
 
 
-@router.post("/process/{device_id}/{request_id}")
-async def restore(device_id: str, 
-                  request_id: str,
+@router.post("/process/")
+async def restore(*,
+                  device_id: str = Form(...), 
+                  request_id: str = Form(...),
+                  report_name: str = Form(...),
                   background_tasks: BackgroundTasks):
 
     # create request uuid
     start_time = now_utc().timestamp()
     
     # run process in backgroud
-    background_tasks.add_task(restore_process, request_id, device_id)
+    background_tasks.add_task(restore_process, request_id, device_id, report_name)
     
     return {
         'time_request': start_time,
