@@ -5,12 +5,12 @@ from fastapi.responses import StreamingResponse
 router = APIRouter()
 
 
-@router.get('/{request_id}/{device_id}')
-async def get_pdf(request_id: str, device_id: str):
+@router.get('/{pdf_name}')
+async def get_pdf(pdf_name: str):
     print('[REPORT]')
-    print('   - Get file: ', request_id + "_"+ device_id + '.pdf')
+    print('   - Get file: ', pdf_name + '.pdf')
     def iterfile():  
-        with open('./storage/pdf/'+request_id + '.pdf', 'rb') as file_like:
+        with open('./storage/pdf/'+pdf_name, 'rb') as file_like:
             yield from file_like 
     return StreamingResponse(iterfile(), media_type="application/pdf")
 
