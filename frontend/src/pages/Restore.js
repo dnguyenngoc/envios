@@ -7,7 +7,6 @@ import * as apiRestoreService from '../services/Restore'
 import SpinLoading from '../components/loadings/SpinLoading';
 
 
-
 const Restore = () => {
   const styles = {
     page: {backgroundImage: `url(${BackGround})`,height: '100%',backgroundPosition: 'center',
@@ -81,7 +80,6 @@ const Restore = () => {
 
     return (
         <div style={styles.page}>
-
             <div style={styles.form}>
                 <div style={styles.titles}>
                     <h5 style={styles.title}>List of DEVICE</h5>

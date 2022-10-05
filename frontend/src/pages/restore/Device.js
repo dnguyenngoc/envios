@@ -2,9 +2,10 @@ import { memo, useEffect, useState, useRef } from "react";
 import Done from '../../assets/images/svg/done.svg'
 import Fail from '../../assets/images/svg/fail.svg'
 import SpinLoading from '../../components/loadings/SpinLoading'
-import { Button, Input} from 'antd';
+import { Button, Input, Popover} from 'antd';
 import * as apiRestoreService from '../../services/Restore';
 import * as apiDeviceService from '../../services/Device';
+import Pdf from "../../components/pdfviews/pdf";
 
 
 
@@ -20,8 +21,8 @@ export default memo(
       restoreLogs: {marginRight: '35px', marginLeft: '15px', display: 'block', width: '42%'},
       restoreReport:  {marginRight: '25px', marginLeft: '2px', display: 'block', width: '18%', padding: '5px'},
       restoreStatus: {width: '20%',marginRight: '25px',textAlign: 'center',alignItems: 'center',display: 'flex'},
-      button: {marginRight: '30px'},
-      siconStatus: {width: '20px',},
+      button: {marginRight: '30px', margin: '3px 3px'},
+      siconStatus: {width: '20px'},
       info:{fontSize: '10px', padding: '0px 10px'},
       restoreReportTitle: {fontSize: '11px'}
     }
@@ -35,6 +36,8 @@ export default memo(
     const [startTime, setStartTime] = useState([])
     const [running, setRunning] = useState(0)
     const [reportName, setReportName] = useState([])
+    const [isShowReport, setIsShowReport] = useState(false)
+    const [reportNameShow, setReportNameShow] = useState('')
 
 
     // need change only one state if you want to increase performace
@@ -187,6 +190,18 @@ export default memo(
       setReportName(tempRpn)
     }
 
+    //Function show report
+    function funcShowReport(i) {
+      if (isShowReport){
+        setIsShowReport(false)
+        setReportNameShow('')
+      }else{
+        let data = reportName[i]
+        setReportNameShow(data)
+        setIsShowReport(true)
+      }
+    }
+
     // Status of restore device
     const Status =(sta) => {
         if (sta === 'not-start' || sta === undefined) return <></>
@@ -198,7 +213,11 @@ export default memo(
     return(<div>
       {ids.map((id, i) => {
         return (
+        
           <div key={i} style={styles.device}>
+            {isShowReport ? <Pdf rName = {reportNameShow}/> : ''}
+            
+
             <div style={styles.deviceInfo}>
               <li style={styles.info}><b>DeviceName:</b> {infos[i].DeviceName}</li>
               <li style={styles.info}><b>ActivationState:</b> {infos[i].ActivationState}</li>
@@ -217,17 +236,26 @@ export default memo(
             </div>
             <div style={styles.restoreReport}>
               <h5 style={styles.restoreReportTitle}>Report Name</h5>
-              <Input value={reportName[i]} onChange={e => funcChangeReportName(e, i)} size='large'  />
+              <Input value={reportName[i]} onChange={e => funcChangeReportName(e, i)} size='normal'/>
             </div>
             <div style={styles.restoreStatus}>
-                    <Button disabled={mode[i] === 'pending' || statusB[i] ? true : false} onClick={()=> funcChangeMode(i)} type="primary" size='large' style={styles.button}>{mode[i]}</Button>
-                    <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='large' style={styles.button}>Restore</Button>
-                    {Status(status[i])}
+                <div style={{display:'grid',  marginRight: '15px'}}>
+                  <Button disabled={mode[i] === 'pending' || statusB[i] ? true : false} onClick={()=> funcChangeMode(i)} type="primary" size='normal' style={styles.button}>{mode[i]}</Button>
+                  <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='normal' style={styles.button}>Restore</Button>
                 </div>
+                
+
+                {Status(status[i])}
+
+               </div>
+               <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>View Report</Button>
+
             </div>
                 )
              })
             }
+        
+
         </div>)
     }
 )
