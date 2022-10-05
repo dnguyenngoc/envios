@@ -17,11 +17,13 @@ export default memo(
       device: {boxShadow: 'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px',
                height: '100px', width: '100%', marginTop: '30px', display: 'inline-flex', padding: '5px 5px'},
       deviceInfo: {display: 'block', width: '20%', listStyleType: 'none'},
-      restoreLogs: {marginRight: '35px', marginLeft: '15px', display: 'block', width: '60%'},
+      restoreLogs: {marginRight: '35px', marginLeft: '15px', display: 'block', width: '42%'},
+      restoreReport:  {marginRight: '25px', marginLeft: '2px', display: 'block', width: '18%', padding: '5px'},
       restoreStatus: {width: '20%',marginRight: '25px',textAlign: 'center',alignItems: 'center',display: 'flex'},
       button: {marginRight: '30px'},
       siconStatus: {width: '20px',},
-      info:{fontSize: '10px', padding: '0px 10px'}
+      info:{fontSize: '10px', padding: '0px 10px'},
+      restoreReportTitle: {fontSize: '11px'}
     }
     
    
@@ -32,6 +34,7 @@ export default memo(
     const [status, setStatus] = useState([])
     const [startTime, setStartTime] = useState([])
     const [running, setRunning] = useState(0)
+    const [reportName, setReportName] = useState([])
 
 
     // need change only one state if you want to increase performace
@@ -40,7 +43,8 @@ export default memo(
       setStatusB(ids.map(item => false));
       setLogs(ids.map(item=> ('')));
       setStatus(ids.map(item=> ('not-start')));
-    }, [ids]);
+      setReportName(infos.map(item=> (item.SerialNumber + '.pdf')));
+    }, [ids, infos]);
 
     let ref  = useRef(null);
 
@@ -102,7 +106,7 @@ export default memo(
     
     // trigger api to start restore
     async function funcRestore(i){
-      apiRestoreService.RunRestore(infos[i].DeviceId, infos[i].RequestID)
+      apiRestoreService.RunRestore(infos[i].DeviceId, infos[i].RequestID, reportName[i])
       .then(res => {
           let sTime = [...startTime]
           sTime[i] = res.time_request
@@ -174,6 +178,15 @@ export default memo(
       }
     }
 
+    // Change report name
+    function funcChangeReportName(e, i){
+      var tempRpn = [...reportName]
+      if (e.target.value.endsWith('.pdf')){
+        tempRpn[i] = e.target.value
+      }
+      setReportName(tempRpn)
+    }
+
     // Status of restore device
     const Status =(sta) => {
         if (sta === 'not-start' || sta === undefined) return <></>
@@ -202,9 +215,12 @@ export default memo(
                   value={logs[i]}
               />
             </div>
+            <div style={styles.restoreReport}>
+              <h5 style={styles.restoreReportTitle}>Report Name</h5>
+              <Input value={reportName[i]} onChange={e => funcChangeReportName(e, i)} size='large'  />
+            </div>
             <div style={styles.restoreStatus}>
-                    <Button disabled={mode[i] === 'pending' || statusB[i] ? true : false} onClick={()=> funcChangeMode(i)} type="info" size='large' style={styles.button}>{mode[i]}</Button>
-
+                    <Button disabled={mode[i] === 'pending' || statusB[i] ? true : false} onClick={()=> funcChangeMode(i)} type="primary" size='large' style={styles.button}>{mode[i]}</Button>
                     <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='large' style={styles.button}>Restore</Button>
                     {Status(status[i])}
                 </div>
