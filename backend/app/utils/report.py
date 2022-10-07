@@ -1,5 +1,7 @@
 import fpdf
 from utils.time import timestamp_to_datetime
+from settings import config
+
 
 
 def create_erasure_info(data, json_data):
@@ -16,9 +18,6 @@ Start/End Time: {start_end}
 """.format(previous_os = previous_os, new_os = new_os, duration = duration, start_end = start_end)
     if status == "SUCCESS":
         status = "ERASED"
-    
-    # status = "ERASED"
-    
     status = ['Status:', status]
     return status, data
 
@@ -34,10 +33,16 @@ def create_hardware_info(info_json):
     'WiFiAddress': True,  'WirelessBoardSerialNumber': True}
     data = ""
     for key, value in info_json.items():
-        print(key, value)
         try:
             if HARDWARE_KEY[key] == True:
+                if key == 'ProductType':
+                    try: # Handle get production type of apple https://gist.github.com/adamawolf/3048717
+                        value = config.APPLE_PRODUCT_TYPE[value]
+                    except Exception as e:
+                        print(e)
+                        print('[REPORT] can not match product type please update list product!')
                 obj = key + ': ' + value + '\n'
+                print(key, value)
                 data += obj
         except:
             pass
