@@ -34,6 +34,7 @@ async def get_list_device():
             print(e)
             continue
         _data = {'DeviceId': device_id}
+        _data['ActualProductType'] = None
         start_time = now_utc().timestamp()
         request_id = str(uuid.uuid5(uuid.NAMESPACE_OID, "restore" + device_id + str(start_time)))
         _data['RequestID']= request_id
@@ -46,6 +47,8 @@ async def get_list_device():
             _str = _str.split(": ")
             key = _str[0]
             val = _str[1]
+            if key == 'ProductType': # using config apple type to get actual productType
+                _data['ActualProductType'] = config.APPLE_PRODUCT_TYPE[val.replace('\n', '')]
             _data[key] = val.replace('\n', '')
         if _check == True:
             save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
@@ -64,8 +67,8 @@ def restore(device_id: str):
     for line in stdout:
         _str = line.decode('utf-8')
         _str = _str.split(": ")
-        key = _str[0]
-        val = _str[1]
+        # key = _str[0]
+        # val = _str[1]
         # if key in list_key:
         #     _data[key] = val.replace('\n', '')
     return _data

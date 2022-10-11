@@ -6,3 +6,4 @@ gunicorn==20.1.0
 redislite==6.2.805324
 sh==1.14.3
 fpdf2==2.5.7
+python-multipart==0.0.5

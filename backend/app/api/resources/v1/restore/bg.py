@@ -28,6 +28,9 @@ def restore_process(request_id: str, device_id: str, report_name: str):
                 'start': now_utc().timestamp(),
                 'end': None,
             },
+            'progress': {
+                'download': 0,
+            },
             'status':{
                 'general': 'pending',
                 'dowload_os': 'pending',
@@ -46,7 +49,7 @@ def restore_process(request_id: str, device_id: str, report_name: str):
     redis.set(request_id, json.dumps(data))
     
     try:
-        process = subprocess.Popen(["idevicerestore", "-e","-l", "-y" ,"-e", "{}".format(chip_id)], 
+        process = subprocess.Popen(["idevicerestore", "--erase","--latest", "--no-input", "--plain-progress","--ecid", "{}".format(chip_id)], 
                                     stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
         
         check_error = False
@@ -63,7 +66,12 @@ def restore_process(request_id: str, device_id: str, report_name: str):
             if output:
                 log = output.strip()
                 str_log = log.decode('utf-8')
-                if str_log.startswith('ERROR: Unable to receive message from FDR'):
+                if str_log.startswith('progress'): # handle process bar 'progress: 0 0.200000'
+                    progress = str_log.split(" ")
+                    progress_type, progress_count = int(progress[-2]), float(progress[-1])
+                    if progress_type == 0:
+                        data['progress']['download'] = progress_count
+                elif str_log.startswith('ERROR: Unable to receive message from FDR'):
                     count += 1
                 elif str_log.startswith("ERROR"):
                     check_error = True
