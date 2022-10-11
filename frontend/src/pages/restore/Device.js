@@ -220,11 +220,10 @@ export default memo(
 
             <div style={styles.deviceInfo}>
               <li style={styles.info}><b>DeviceName:</b> {infos[i].DeviceName}</li>
-              <li style={styles.info}><b>ActivationState:</b> {infos[i].ActivationState}</li>
+              <li style={styles.info}><b>DeviceType:</b> {infos[i].ActualProductType}</li>
               <li style={styles.info}><b>ProductVersion:</b> {infos[i].ProductVersion}</li>
+              <li style={styles.info}><b>ActivationState:</b> {infos[i].ActivationState}</li> 
               <li style={styles.info}><b>DeviceColor:</b> {infos[i].DeviceColor}</li>
-              <li style={styles.info}><b>RequestId:</b> {infos[i].RequestID}</li>
-
             </div>
             <div style={styles.restoreLogs}>
               <TextArea
