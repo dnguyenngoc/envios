@@ -9,6 +9,7 @@ import time
 from utils.report import make_report
 from utils.file import load_file
 from settings import config
+from utils.decode import decode_or_str
 
 
 def restore_process(request_id: str, device_id: str, report_name: str):
@@ -55,7 +56,7 @@ def restore_process(request_id: str, device_id: str, report_name: str):
         process = subprocess.Popen(["idevicerestore", "--erase","--latest", "--no-input", "--plain-progress","--ecid", "{}".format(chip_id)], 
                                     stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
         
-        check_error = False
+        check_error = False 
         stop_loop = False
         count= 0
         while True:
@@ -68,7 +69,7 @@ def restore_process(request_id: str, device_id: str, report_name: str):
             output = process.stdout.readline()
             if output:
                 log = output.strip()
-                str_log = log.decode('utf-8')
+                str_log = decode_or_str(log) # try to decode if can't cover this like a string
                 if str_log.startswith('progress'): # handle process bar 'progress: 0 0.200000'
                     progress = str_log.split(" ")
                     progress_type, _ = int(progress[-2]), float(progress[-1])
@@ -144,10 +145,3 @@ def restore_process(request_id: str, device_id: str, report_name: str):
         make_report(report_name, data, info) 
         print('[{}] Make report {} success'.format(request_id, report_name+ '.pdf'))
         
-        
-                
-            
-            
-            
-            
-            
