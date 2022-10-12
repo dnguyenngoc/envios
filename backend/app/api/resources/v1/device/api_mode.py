@@ -59,10 +59,16 @@ async def change(*,
                     check_error = True
                     data['logs'].append('Change mode to normal pass. Maybe device have been normal')
                     count += 10
+                elif str_log.startswith('Failed to enter recovery mode.') and type == 'dfu':
+                    data['logs'].append('Change mode to dfu failed')
+                    check_error = True
+                    count += 10
                 elif str_log.startswith("No device found with udid"):
                     check_error = True
                     data['logs'].append('Change mode to dfu pass. Maybe device have been dfu')
                     count += 10
+              
+                    
                 print(str_log)
             else:
                 count += 10

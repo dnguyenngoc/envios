@@ -29,7 +29,10 @@ def restore_process(request_id: str, device_id: str, report_name: str):
                 'end': None,
             },
             'progress': {
-                'download': 0,
+                'name': '',
+                'step': 0,
+                'percent': 0,
+                'status': True,
             },
             'status':{
                 'general': 'pending',
@@ -68,9 +71,26 @@ def restore_process(request_id: str, device_id: str, report_name: str):
                 str_log = log.decode('utf-8')
                 if str_log.startswith('progress'): # handle process bar 'progress: 0 0.200000'
                     progress = str_log.split(" ")
-                    progress_type, progress_count = int(progress[-2]), float(progress[-1])
+                    progress_type, _ = int(progress[-2]), float(progress[-1])
                     if progress_type == 0:
-                        data['progress']['download'] = progress_count
+                        data['progress']['name'] = 'Dowloading'
+                        data['progress']['percent'] = 10
+                    elif progress_type == 1:
+                        data['progress']['name'] = 'Erasing'
+                        data['progress']['percent'] = 20
+                    elif progress_type == 2:
+                        data['progress']['name'] = 'Erasing'
+                        data['progress']['percent'] = 30
+                    elif progress_type == 3:
+                        data['progress']['name'] = 'Verifying restore'
+                        data['progress']['percent'] = 50
+                    elif progress_type == 4:
+                        data['progress']['name'] = 'Flashing firmware'
+                        data['progress']['percent'] = 60
+                    elif time.process_time == 6:
+                        data['progress']['name'] = 'Requesting FUD data'
+                        data['progress']['percent'] = 70
+                    data['progress']['step'] = progress_type+5
                 elif str_log.startswith('ERROR: Unable to receive message from FDR'):
                     count += 1
                 elif str_log.startswith("ERROR"):
@@ -98,13 +118,20 @@ def restore_process(request_id: str, device_id: str, report_name: str):
 
         if check_error:
             data['status']['general'] = 'failed'
+            data['progress']['status'] = False
         elif stop_loop:
             data['status']['general'] = 'success'
+            data['progress']['status'] = True
+            data['progress']['percent'] = 100
+            data['progress']['step'] = 12
+            data['progress']['name'] = 'Completed!'
         data['times']['end'] = now_utc().timestamp()
         redis.set(request_id, json.dumps(data))
         print('[{}] Done!'.format(request_id))
         
     except Exception as e:
+        data['progress']['status'] = False
+        data['progress']['percent'] = 50
         data['status']['general'] = 'failed'
         data['error'].append(str(e))
         data['logs'].append(str(e))

@@ -2,7 +2,8 @@ import { memo, useEffect, useState, useRef } from "react";
 import Done from '../../assets/images/svg/done.svg'
 import Fail from '../../assets/images/svg/fail.svg'
 import SpinLoading from '../../components/loadings/SpinLoading'
-import { Button, Input, Popover} from 'antd';
+import { Button, Input, Progress} from 'antd';
+import { red, green } from '@ant-design/colors';
 import * as apiRestoreService from '../../services/Restore';
 import * as apiDeviceService from '../../services/Device';
 import Pdf from "../../components/pdfviews/pdf";
@@ -16,7 +17,7 @@ export default memo(
   function Device({ ids, infos, handleInprocess}){
     const styles = {
       device: {boxShadow: 'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px',
-               height: '100px', width: '100%', marginTop: '30px', display: 'inline-flex', padding: '5px 5px'},
+               height: '100px', width: '100%', marginTop: '30px', display: 'inline-flex', padding: '5px 5px', background: 'white'},
       deviceInfo: {display: 'block', width: '20%', listStyleType: 'none'},
       restoreLogs: {marginRight: '35px', marginLeft: '15px', display: 'block', width: '42%'},
       restoreReport:  {marginRight: '25px', marginLeft: '2px', display: 'block', width: '18%', padding: '5px'},
@@ -38,16 +39,21 @@ export default memo(
     const [reportName, setReportName] = useState([])
     const [isShowReport, setIsShowReport] = useState(false)
     const [reportNameShow, setReportNameShow] = useState('')
+    const [steps, setSteps] = useState([])
+    const [processColors, setProcessColors] = useState([])
 
 
     // need change only one state if you want to increase performace
     useEffect(() => {
+      setSteps(infos.map(item=> ({step: 0, percent: 0, name: '', status: true})));
+      setProcessColors(infos.map(item => ([green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]])))
       setMode(ids.map(item => ('normal')));
       setStatusB(ids.map(item => false));
       setLogs(ids.map(item=> ('')));
       setStatus(ids.map(item=> ('not-start')));
       setReportName(infos.map(item=> (item.SerialNumber + '.pdf')));
     }, [ids, infos]);
+    // console.log(steps)
 
     let ref  = useRef(null);
 
@@ -62,6 +68,8 @@ export default memo(
           let stemp = [...status]
           let sbtemp = [...statusB]
           let slogs = [...logs]
+          let stepsTemp = [...steps]
+          let processColorsTemp = [...processColors]
 
           var requestIds  = []
           status.forEach((item, i) => {requestIds.push(infos[i].RequestID)})
@@ -69,10 +77,19 @@ export default memo(
 
           await apiRestoreService.GetStatusList(requestIds)
           .then(res => { 
+            console.log(res)
             res.data.map((item, i) => {
               stemp[i] = item.status.general
               slogs[i] = item.logs.at(-1)
-              
+              stepsTemp[i] = item.progress
+              let tempx = [red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5]]
+
+              if (item.progress.status === true){
+                tempx = [green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]]
+              }else{
+                tempx = [red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5],red[5]]
+              }
+              processColorsTemp[i] = tempx
               if (item.status.general === 'success') {
                 sbtemp[i] = false
               }else if (item.status.general === 'failed'){
@@ -89,6 +106,8 @@ export default memo(
           setStatus(stemp)
           setStatusB(sbtemp)
           setLogs(slogs)
+          setSteps(stepsTemp)
+          setProcessColors(processColorsTemp)
           
           if (stemp.every(isDone)) {
             clearInterval(ref.current) // Stop the interval if the condition holds true
@@ -104,7 +123,7 @@ export default memo(
       return () => {
         clearInterval(ref.current); // unmount coponent
       };
-    }, [running, infos, status, statusB, logs, handleInprocess])
+    }, [running, infos, status, statusB, logs, handleInprocess, processColors, steps])
 
     
     // trigger api to start restore
@@ -122,17 +141,23 @@ export default memo(
       let newArr = [...statusB];
       let newLogs = [...logs];
       let newStatus = [...status];
+      let stepsTemp = [...steps];
+      let processColorsTemp = [...processColors]
 
+      stepsTemp[i] = {step: 0, percent: 0, name: '', status: true}
       newStatus[i] = 'pending'
       newLogs[i] = 'Starting restore phone ....'
       newArr[i] = true;
+      processColorsTemp[i] = [green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]]
+
 
 
       setLogs(newLogs)
       setStatusB(newArr)
       setStatus(newStatus)
       setRunning(running+1)
-      
+      setSteps(stepsTemp)
+      setProcessColors(processColorsTemp)
     }
 
     // const sleep = (milliseconds) => {
@@ -216,8 +241,6 @@ export default memo(
         
           <div key={i} style={styles.device}>
             {isShowReport ? <Pdf rName = {reportNameShow}/> : ''}
-            
-
             <div style={styles.deviceInfo}>
               <li style={styles.info}><b>DeviceName:</b> {infos[i].DeviceName}</li>
               <li style={styles.info}><b>DeviceType:</b> {infos[i].ActualProductType}</li>
@@ -229,9 +252,18 @@ export default memo(
               <TextArea
                 placeholder="Logs of process"
                   className="custom"
-                  style={{height: 80, maxHeight: 80}}
+                  style={{height: 80, maxHeight: 60}}
                   value={logs[i]}
               />
+             
+              {steps[i] !== undefined ?
+                <div style={{display: 'inline-flex', height: '20px'}}>
+                <Progress style={{paddingTop: '4px'}} percent={steps[i].percent} steps={12} strokeColor={processColors[i]} />
+                <p style={{paddingLeft: '10px'}}>{steps[i].name}</p>
+              </div>
+                : ''
+              }
+              
             </div>
             <div style={styles.restoreReport}>
               <h5 style={styles.restoreReportTitle}>Report Name</h5>
@@ -243,11 +275,13 @@ export default memo(
                   <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='normal' style={styles.button}>Restore</Button>
                 </div>
                 
-
                 {Status(status[i])}
 
                </div>
+               <div style={{float: 'left'}}>
                <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>View Report</Button>
+               {/* <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>Stop</Button> */}
+               </div>
 
             </div>
                 )
