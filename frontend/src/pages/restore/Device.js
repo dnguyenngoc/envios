@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, useRef } from "react";
+import { memo, useEffect, useState, useRef, useCallback } from "react";
 import Done from '../../assets/images/svg/done.svg'
 import Fail from '../../assets/images/svg/fail.svg'
 import SpinLoading from '../../components/loadings/SpinLoading'
@@ -45,12 +45,12 @@ export default memo(
 
     // need change only one state if you want to increase performace
     useEffect(() => {
-      setSteps(infos.map(item=> ({step: 0, percent: 0, name: '', status: true})));
-      setProcessColors(infos.map(item => ([green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]])))
-      setMode(ids.map(item => ('normal')));
-      setStatusB(ids.map(item => false));
-      setLogs(ids.map(item=> ('')));
-      setStatus(ids.map(item=> ('not-start')));
+      setSteps(infos.map(_=> ({step: 0, percent: 0, name: '', status: true})));
+      setProcessColors(infos.map(_ => ([green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]])))
+      setMode(ids.map(_ => ('normal')));
+      setStatusB(ids.map(_ => false));
+      setLogs(ids.map(_=> ('')));
+      setStatus(ids.map(_=> ('not-start')));
       setReportName(infos.map(item=> (item.SerialNumber + '.pdf')));
     }, [ids, infos]);
     // console.log(steps)
@@ -72,7 +72,7 @@ export default memo(
           let processColorsTemp = [...processColors]
 
           var requestIds  = []
-          status.forEach((item, i) => {requestIds.push(infos[i].RequestID)})
+          status.forEach((_, i) => {requestIds.push(infos[i].RequestID)})
           // console.log("Request_IDs:", requestIds)
 
           await apiRestoreService.GetStatusList(requestIds)
@@ -150,8 +150,6 @@ export default memo(
       newArr[i] = true;
       processColorsTemp[i] = [green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6],green[6]]
 
-
-
       setLogs(newLogs)
       setStatusB(newArr)
       setStatus(newStatus)
@@ -159,10 +157,6 @@ export default memo(
       setSteps(stepsTemp)
       setProcessColors(processColorsTemp)
     }
-
-    // const sleep = (milliseconds) => {
-    //   return new Promise(resolve => setTimeout(resolve, milliseconds))
-    // }
 
     // function handle logs
     function funcUpdateLog(i, message){
@@ -227,6 +221,13 @@ export default memo(
       }
     }
 
+    // Function close report
+    const funcCloseReport = useCallback(() => {
+      setIsShowReport(false)
+      setReportNameShow('')
+    })
+
+    
     // Status of restore device
     const Status =(sta) => {
         if (sta === 'not-start' || sta === undefined) return <></>
@@ -235,12 +236,17 @@ export default memo(
         else return <img src={Fail} alt='' style={styles.siconStatus}></img>
     }
 
+    // Function stop process
+    // function funcStopProcess(i){
+    //   console.log("Stop process of ", infos[i])
+    // }
+
     return(<div>
       {ids.map((id, i) => {
         return (
         
           <div key={i} style={styles.device}>
-            {isShowReport ? <Pdf rName = {reportNameShow}/> : ''}
+            {isShowReport ? <Pdf rName = {reportNameShow} funcCloseReport={funcCloseReport}/> : ''}
             <div style={styles.deviceInfo}>
               <li style={styles.info}><b>DeviceName:</b> {infos[i].DeviceName}</li>
               <li style={styles.info}><b>DeviceType:</b> {infos[i].ActualProductType}</li>
@@ -278,9 +284,9 @@ export default memo(
                 {Status(status[i])}
 
                </div>
-               <div style={{float: 'left'}}>
+               <div style={{textAlign: 'center'}}>
                <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>View Report</Button>
-               {/* <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>Stop</Button> */}
+               {/* <Button onClick={()=> funcStopProcess(i)} type="ghost" size='normal' style={{width: '110px', backgroundColor: 'gray', color: 'white'}}>Stop</Button> */}
                </div>
 
             </div>
