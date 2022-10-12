@@ -3,6 +3,22 @@ from utils.time import timestamp_to_datetime
 from settings import config
 
 
+def create_battery_info(data, json_data):
+    serial = json_data['BatterySerialNumber']
+    manufacture_date = json_data['BatteryManufactureDate']
+    cycle_count = json_data['BatteryCycleCount']
+    max_capacity = json_data['BatteryMaxCapacity']
+    maximun_charge_current = json_data['BatteryMaximumChargeCurrent']
+    status = True
+    
+    data = """Battery Serial Number: {serial}
+Battery Manufacture Date: {manufacture_date}
+Battery CycleCount: {cycle_count}
+Battery MaxCapacity: {max_capacity}
+Battery Maximum ChargeCurrent: {maximun_charge_current}
+""".format(serial=serial, manufacture_date=manufacture_date,cycle_count=cycle_count, 
+           max_capacity=max_capacity, maximun_charge_current=maximun_charge_current)
+    return status, data
 
 def create_erasure_info(data, json_data):
     previous_os = json_data['ProductVersion']
@@ -61,7 +77,7 @@ def make_report(name, data, info_json):
     title = "Data Erasure Report"
     erasure_results_title = 'Erasure Results'
     hardware_detail_title = "Hardware Details"
-    # battery_info_title = 'Battery Information'
+    battery_info_title = 'Battery Information'
     
     # make data
     status_erasure, text_erasure = create_erasure_info(data, info_json)
@@ -127,13 +143,71 @@ def make_report(name, data, info_json):
     pdf.set_text_color(0)
     pdf.cell(0, 13, txt = hardware_detail_title)
     pdf.ln()
+
+
+    import io
+    
+    buf = io.StringIO(text_hardware)
+    buf.readline()
+    col1, col2 = "", ""
+    for idx, line in enumerate(buf):
+        if idx%2==0:
+            col1 += line
+        else:
+            col2 += line
+            
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
+    pdf.set_text_color(128)
+    pdf.set_font('NotoSans', '', 8)
+    pdf.multi_cell(0, 5, col1)
+    pdf.set_xy(100 + pdf.l_margin, ybefore)
+    pdf.multi_cell(0, 5, col2)
+    
+
+    # ybefore = pdf.get_y()
+    # pdf.set_xy(pdf.l_margin + 5, ybefore)
+    # pdf.set_text_color(128)
+    # pdf.set_font('NotoSans', '', 8)
+    # pdf.multi_cell(0, 5, text_hardware)
+    # pdf.ln()
+    
+    
+    _, text_battery = create_battery_info(data, info_json)
+    ybefore = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 5, ybefore)
+    pdf.set_font('NotoSans', '', 13)
+    pdf.set_text_color(0)
+    pdf.cell(0, 13, txt = battery_info_title)
+    pdf.ln()
     
     ybefore = pdf.get_y()
     pdf.set_xy(pdf.l_margin + 5, ybefore)
     pdf.set_text_color(128)
     pdf.set_font('NotoSans', '', 8)
-    pdf.multi_cell(0, 5, text_hardware)
+    pdf.multi_cell(0, 5, text_battery)
     pdf.ln()
+    
+
+     
+ 
+    # # battery info
+    # ybefore = pdf.get_y()
+    # pdf.set_xy(pdf.l_margin + 5, ybefore)
+    # pdf.set_font('NotoSans', '', 13)
+    # pdf.set_text_color(0)
+    # pdf.cell(0, 13, txt = battery_info_title)
+    # pdf.ln()
+    # pdf.set_text_color(128)
+    # pdf.set_font('NotoSans', '', 8)
+    
+    # ybefore = pdf.get_y()
+    # pdf.set_xy(pdf.l_margin, ybefore)
+    
+    # pdf.multi_cell(0, 5, col1)
+    # pdf.set_xy(100 + pdf.l_margin, ybefore)
+    # pdf.multi_cell(0, 5, col2)
+    
     
     
 
@@ -158,36 +232,6 @@ def make_report(name, data, info_json):
     pdf.set_xy(120 + pdf.l_margin, ybefore)
     pdf.cell(0, 10, 'SUPERVISOR', 0,0, '')
     
-    
-    
-    # pdf.multi_cell(0, 5, col1)
-    # pdf.set_xy(100 + pdf.l_margin, ybefore)
-    # pdf.multi_cell(0, 5, col2)
-    
-    # buf = io.StringIO(data['battery_info'])
-    # buf.readline()
-    # col1, col2 = "", ""
-    # for idx, line in enumerate(buf):
-    #     if idx%2==0:
-    #         col1 += line
-    #     else:
-    #         col2 += line
-    # print(col1, col2)  
-         
-    # # battery info
-    # pdf.set_font('NotoSans', '', 13)
-    # pdf.set_text_color(0)
-    # pdf.cell(0, 10, txt = battery_info_title)
-    # pdf.ln()
-    # pdf.set_text_color(128)
-    # pdf.set_font('NotoSans', '', 8)
-    
-    # ybefore = pdf.get_y()
-    # pdf.set_xy(pdf.l_margin, ybefore)
-    
-    # pdf.multi_cell(0, 5, col1)
-    # pdf.set_xy(100 + pdf.l_margin, ybefore)
-    # pdf.multi_cell(0, 5, col2)
     
 
     pdf.output("./storage/pdf/{}.pdf".format(name))  
