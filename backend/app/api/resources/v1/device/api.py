@@ -27,8 +27,6 @@ class Device:
         except:
             return None
         
-    
-    
 device = Device()
 
 
