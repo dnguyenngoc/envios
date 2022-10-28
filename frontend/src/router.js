@@ -5,6 +5,7 @@ import NotFound from "./components/responses/NotFound.js";
 import Header from "./components/headers/HeaderV1.js";
 
 import Restore from './pages/Restore'
+import RestoreRedux from './pages/RestoreRedux'
 import Home from './pages/Home.js'
 
 
@@ -16,6 +17,7 @@ const RoutesInit = () => {
       <Routes>
          <Route path='/' element={<Home/>} />
          <Route path='/tool/restore' element={<Restore/>} />
+         <Route path='/tool/restore-redux' element={<RestoreRedux/>} />
          {/* <Route path='/account' element={<ProtectedRoute  authed={auth} component={<Account/>}/>} /> */}
          <Route path='*' element={<NotFound />} />
       </Routes>

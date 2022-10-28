@@ -225,7 +225,7 @@ export default memo(
     const funcCloseReport = useCallback(() => {
       setIsShowReport(false)
       setReportNameShow('')
-    })
+    }, [])
 
     
     // Status of restore device
@@ -283,8 +283,9 @@ export default memo(
                 
                 {Status(status[i])}
 
-               </div>
-               <div style={{textAlign: 'center'}}>
+            </div>
+
+            <div style={{textAlign: 'center'}}>
                <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>View Report</Button>
                {/* <Button onClick={()=> funcStopProcess(i)} type="ghost" size='normal' style={{width: '110px', backgroundColor: 'gray', color: 'white'}}>Stop</Button> */}
                </div>

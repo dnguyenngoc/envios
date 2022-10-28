@@ -1,0 +1,53 @@
+.device {
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    height: 100px;
+    width: 100%;
+    margin-top: 30px; 
+    display: inline-flex;
+    padding: 5px 5px;
+    background: white
+}
+
+.deviceInfo {
+    display: block; 
+    width: 20%; 
+    list-style-type: none;
+}
+.restoreLogs {
+    margin-right:  35px; 
+    margin-left:  15px; 
+    display:  block;
+    width: 42%;
+}
+.restoreReport  {
+    margin-right:  25px; 
+    margin-left:  2px; 
+    display:  block;
+    width:  18%; 
+    padding: 5px;
+}
+.restoreStatus {
+    width: 20%;
+    margin-right:  25px;
+    text-align:  center;
+    align-items:  center;
+    display: flex;
+}
+.button {
+    margin-right: 30px;
+    margin: 3px 3px;
+}
+.siconStatus {
+    width: 20px;
+}
+.info{
+    font-size: 10px;
+    padding: 0px 10px;
+}
+.restoreReportTitle {
+    font-size: 11px;
+}
+
+.reportClose{
+    display: grid;
+}
