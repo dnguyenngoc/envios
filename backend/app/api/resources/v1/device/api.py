@@ -13,36 +13,65 @@ import subprocess
 router = APIRouter()
 
 
-# list_key = ['UniqueDeviceID', 'UniqueChipID', 'TimeZone', 'SerialNumber', 'RegionInfo', 'ProductVersion', 'ProductType', 'ProductName', 'HardwareModel', 'DeviceColor', 'DeviceName','ActivationState', 'ProductName']
+class Device:
+    
+    def _request_uuid(self, device_id):
+        start_time = now_utc().timestamp()
+        request_id = str(uuid.uuid5(uuid.NAMESPACE_OID, "restore" + device_id + str(start_time)))
+        return request_id
+    
+    def _actual_product_type(self, product_type):
+        try:
+            data = config.APPLE_PRODUCT_TYPE[product_type]
+            return data
+        except:
+            return None
+        
+    
+    
+device = Device()
 
 
 @router.get('/info/list')
 async def get_list_device():
-    print('[LIST-DEVICE]')
+    print('------------------------\n [LIST-DEVICE]')
     rst = subprocess.Popen(["idevice_id"], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
     stdout  = rst.stdout
     data = []
     for line in stdout:
         _str = line.decode('utf-8')
+        
+        # Raise HTTP 404 not found when command check device list error
         if _str.__contains__("ERROR"):
             raise HTTPException(status_code=404, detail='Not found')
+
+        # make device and request_id
         device_id = _str.split()[0]
+        request_id = device._request_uuid(device_id) 
+               
+        # Try to get device infor of each device in list idevice
         print('   - {}: get Info'.format(device_id))
         try:
             info = subprocess.Popen(["ideviceinfo", "-u", "{}".format(device_id)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             stdout = info.stdout
         except Exception as e:
-            print(e)
+            print('[ERROR] Can not get device info by ideviceinfo?' + e)
             continue
-        _data = {'DeviceId': device_id}
+        
+        # Create default data even thought can't get baterry on device info
+        _data = {}
+        _data['DeviceId'] = device_id 
         _data['ActualProductType'] = None
-        start_time = now_utc().timestamp()
-        request_id = str(uuid.uuid5(uuid.NAMESPACE_OID, "restore" + device_id + str(start_time)))
         _data['RequestID']= request_id
+        _data['BatterySerialNumber'] = ''
+        _data['BatteryManufactureDate'] = ''
+        _data['BatteryCycleCount'] = ''
+        _data['BatteryMaxCapacity'] = ''
+        _data['BatteryMaximumChargeCurrent'] = ''
         
         product_type = ''
-        
         _check = True
+        
         for line in stdout:
             _str = line.decode('utf-8')
             if _str.startswith("ERROR"):
@@ -51,51 +80,58 @@ async def get_list_device():
             _str = _str.split(": ")
             key = _str[0]
             val = _str[1]
-            if key == 'ProductType': # using config apple type to get actual productType
+            
+            # using config apple type to get actual productType
+            if key == 'ProductType': 
                 product_type = val.replace('\n', '')
-                _data['ActualProductType'] = config.APPLE_PRODUCT_TYPE[product_type]
+                _data['ActualProductType'] = device._actual_product_type(product_type)
+            
+            # update other data key, value base on result of ideviceinfo    
             _data[key] = val.replace('\n', '')
         
         if product_type.startswith('iPhone'):
             p_type_ver = float(product_type.split('iPhone')[-1].replace(',', '.'))
             if p_type_ver <= 9.4:
+                
                  # Get battery info
                 print("   - [GET-Battery] process..")
                 try:
+                    temp = {}
+                    temp['BatterySerialNumber'] = None
+                    temp['BatteryManufactureDate'] = None
+                    temp['BatteryCycleCount'] = None
+                    temp['BatteryMaxCapacity'] = None
+                    temp['BatteryMaximumChargeCurrent'] = None
+                    
                     battery = subprocess.Popen(["idevicediagnostics", 'ioregentry', 'AppleARMPMUCharger', "-u", "{}".format(device_id)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     battery_stdout = battery.stdout
                     lines = list(battery_stdout)
-            
-                    x = {}
-                    x['BatterySerialNumber'] = None
-                    x['BatteryManufactureDate'] = None
-                    x['BatteryCycleCount'] = None
-                    x['BatteryMaxCapacity'] = None
-                    x['BatteryMaximumChargeCurrent'] = None
-                
+                    # print(lines)
                     for i, line in enumerate(lines):
                         str_line = line.decode('utf-8')
-                        if (str_line.__contains__('BatterySerialNumber') or str_line.__contains__('<key>Serial</key>')) and x['BatterySerialNumber']== None:
-                            x['BatterySerialNumber'] = i+1
-                        elif str_line.__contains__('CycleCount') and x['BatteryCycleCount']== None:
-                            x['BatteryCycleCount'] = i+1
+                        if (str_line.__contains__('BatterySerialNumber') or str_line.__contains__('<key>Serial</key>')) and temp['BatterySerialNumber']== None:
+                            temp['BatterySerialNumber'] = i+1
+                        elif str_line.__contains__('CycleCount') and temp['BatteryCycleCount']== None:
+                            temp['BatteryCycleCount'] = i+1
                         elif str_line.__contains__('ManufactureDate'):
-                            x['BatteryManufactureDate'] = i+1
-                        elif str_line.__contains__('MaxCapacity') and x['BatteryMaxCapacity']==None:
-                            x['BatteryMaxCapacity'] = i+1
+                            temp['BatteryManufactureDate'] = i+1
+                        elif str_line.__contains__('MaxCapacity') and temp['BatteryMaxCapacity']==None:
+                            temp['BatteryMaxCapacity'] = i+1
                         elif str_line.__contains__('MaximumChargeCurrent'):
-                            x['BatteryMaximumChargeCurrent'] = i+1
-                    for key, val in x.items():
+                            temp['BatteryMaximumChargeCurrent'] = i+1
+                            
+                    for key, val in temp.items():
                         if val != None:
                             t_data  = regex.search('\>([A-Za-z0-9]+)\<', lines[val].decode('utf-8')).groups()
                             _data[key] = t_data[0]
                         else:
                             _data[key] = ''
-                    print("   - [GET-Battery] Success", x)
+                        print(f"   - [GET-Battery] {key} -> {_data[key]}")
+                
                 except Exception as e:
                     print("   - [GET-Battery] ERROR", e) 
             else:
-                pass
+                print((f"   - [GET-Battery] not support for {_data['ActualProductType']} now!") )
         
         if _check == True:
             save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
