@@ -11,7 +11,7 @@ export function RunRestore(deviceId, requestId, reportName) {
   formData.append('report_name', reportName)
   var config = {
     method: 'post',
-    url: BASE_URL + 'v1/restore/process/',
+    url: BASE_URL + 'v1/ios/restore/process/',
     headers: { 
     },
     data : formData
@@ -26,7 +26,7 @@ export function RunRestore(deviceId, requestId, reportName) {
 export async function GetStatus(requestId) {
     const promise = await axios({
         timeout: 3000,
-        url: BASE_URL + `v1/restore/status/${requestId}`,
+        url: BASE_URL + `v1/ios/restore/status/${requestId}`,
         method: 'get',
         headers: { 'accept': 'application/json' }
       }
@@ -46,7 +46,7 @@ export async function GetStatusList(requestIds){
     var data = JSON.stringify({"requests": requestIds});
       var config = {
         method: 'post',
-        url: BASE_URL + 'v1/restore/status/',
+        url: BASE_URL + 'v1/ios/restore/status/',
         headers: { 
           'Content-Type': 'application/json'
         },
@@ -63,7 +63,7 @@ export async function GetStatusList(requestIds){
 export function StopAllProcess(filter){
   var config = {
     method: 'post',
-    url: BASE_URL +  `v1/restore/remove-all-bg/?filter=${filter}`,
+    url: BASE_URL +  `v1/ios/restore/remove-all-bg/?filter=${filter}`,
     headers: { 
       'Content-Type': 'application/json'
     },
@@ -74,7 +74,7 @@ export function StopAllProcess(filter){
 export function removeLogs(filter){
   var config = {
     method: 'post',
-    url: BASE_URL +  `v1/restore/remove-all-logs/`,
+    url: BASE_URL +  `v1/ios/restore/remove-all-logs/`,
     headers: { 
       'Content-Type': 'application/json'
     },

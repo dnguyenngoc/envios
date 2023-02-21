@@ -4,7 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import NotFound from "./components/responses/NotFound.js";
 import Header from "./components/headers/HeaderV1.js";
 
-import Restore from './pages/Restore'
+import IOSRestore from './pages/IOSRestore'
+import AndroidRestore from './pages/AndroidRestore'
 import Home from './pages/Home.js'
 
 
@@ -15,7 +16,8 @@ const RoutesInit = () => {
       <Header/>
       <Routes>
          <Route path='/' element={<Home/>} />
-         <Route path='/tool/restore' element={<Restore/>} />
+         <Route path='/tool/ios-restore' element={<IOSRestore/>} />
+         <Route path='/tool/android-restore' element={<AndroidRestore/>} />
          {/* <Route path='/account' element={<ProtectedRoute  authed={auth} component={<Account/>}/>} /> */}
          <Route path='*' element={<NotFound />} />
       </Routes>
