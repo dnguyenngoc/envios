@@ -4,7 +4,7 @@ logs/
 redis.db
 redis.db.settings
 .DS_Store
-iPhone*
+iPhone_*
 backend/app/storage/**/*.pdf
 backend/app/storage/**/*.json
 

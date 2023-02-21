@@ -23,6 +23,9 @@ cd idevicerestore && git pull && ./autogen.sh && ./configure && sudo make instal
 
 sudo ldconfig
 
+# 1.1 install lib for android
+sudo apt install android-tools-adb android-tools-fastboot -y
+
 ## 2. Re-pull git repo
 git pull
 
