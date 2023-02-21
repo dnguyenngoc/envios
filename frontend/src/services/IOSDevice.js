@@ -8,7 +8,7 @@ const BASE_URL = 'http://localhost:8081/api/'
 export function GetDeviceList() {
 
     const promise = axios.get(
-        BASE_URL + 'v1/device/info/list',
+        BASE_URL + 'v1/ios/device/info/list',
         {
             headers: {
                 'accept': 'application/json'
@@ -29,7 +29,7 @@ export function ChangeMode(requestId, deviceId, type){
     // console.log('formdata', formData)
     var config = {
         method: 'post',
-        url: BASE_URL + 'v1/device/mode/',
+        url: BASE_URL + 'v1/ios/device/mode/',
         headers: { 
         },
         data : formData

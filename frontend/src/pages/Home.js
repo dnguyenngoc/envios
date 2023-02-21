@@ -44,7 +44,7 @@ const Home = () => {
                     <img style={styles.titleImage} alt='' src = {PiLogo}></img>
                 </h5>
             </div>
-            <Button type="primary" shape="round" size='large' href='/tool/restore'
+            <Button type="primary" shape="round" size='large' href='/tool/ios-restore'
                 style={{ 
                     background: "#F76540",
                     borderColor: "#F76540", 

@@ -4,8 +4,8 @@ import Fail from '../../assets/images/svg/fail.svg'
 import SpinLoading from '../../components/loadings/SpinLoading'
 import { Button, Input, Progress} from 'antd';
 import { red, green } from '@ant-design/colors';
-import * as apiRestoreService from '../../services/Restore';
-import * as apiDeviceService from '../../services/Device';
+import * as apiRestoreService from '../../services/IOSRestore';
+import * as apiDeviceService from '../../services/IOSDevice';
 import Pdf from "../../components/pdfviews/pdf";
 
 
