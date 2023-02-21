@@ -2,6 +2,8 @@ import uuid
 import subprocess
 from fastapi import APIRouter, HTTPException
 from utils.time import now_utc
+from settings import config
+from utils.file import save_file
 
 
 router = APIRouter()
@@ -15,14 +17,11 @@ def request_uuid(device_id):
     
 @router.get('/info/list')
 async def get_list_device():
-    
-
 
     print('------------------------\n [LIST-DEVICE]')
     rst = subprocess.Popen(["adb", "devices", "-l"], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
     stdout  = rst.stdout
     data = []
-    
     
     count = 0
     for line in stdout:
@@ -50,7 +49,7 @@ async def get_list_device():
         # Create default data even thought can't get baterry on device info
         _data = {}
         _data['device_id'] = device_id 
-        _data['reequest_id']= request_id
+        _data['request_id']= request_id
         _data['battery.serial_number'] = ''
         _data['battery.manufacture_date'] = ''
         _data['battery.cycle_count'] = ''
@@ -75,6 +74,9 @@ async def get_list_device():
                         _data[key] = "Android " + val
                     else:
                         _data[key] = val
+        
+        save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
+        
         data.append(_data)
 
     if count == 0:
