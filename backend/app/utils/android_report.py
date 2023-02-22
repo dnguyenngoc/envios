@@ -4,19 +4,19 @@ from settings import config
 
 
 def create_battery_info(data, json_data):
-    serial = json_data['battery.serial_number']
+    technology = json_data['battery.technology']
     manufacture_date = json_data['battery.manufacture_date']
     cycle_count = json_data['battery.cycle_count']
     max_capacity = json_data['battery.max_capacity']
     maximun_charge_current = json_data['battery.maximum_charge_current']
     status = True
     
-    data = """Battery Serial Number: {serial}
+    data = """Battery Technology: {technology}
 Battery Manufacture Date: {manufacture_date}
 Battery CycleCount: {cycle_count}
 Battery MaxCapacity: {max_capacity}
 Battery Maximum ChargeCurrent: {maximun_charge_current}
-""".format(serial=serial, manufacture_date=manufacture_date,cycle_count=cycle_count, 
+""".format(technology=technology, manufacture_date=manufacture_date,cycle_count=cycle_count, 
            max_capacity=max_capacity, maximun_charge_current=maximun_charge_current)
     return status, data
 
@@ -47,12 +47,25 @@ def create_hardware_info(info_json):
         'ro.product.device': True, 
         'ro.product.locale': True, 
         'ro.product.manufacturer': True, 
-        'ro.product.model': True
+        'ro.product.model': True,
+        'ro.product.model': True,
+        'wlan.mac.address': True,
+        'ro.serialno': True,
+        "ro.hardware": True,
+        'ro.product.locale.region': True,
+        'ro.config.default_timezone': True,
+        'ro.config.bluetooth.name': True,
+        'ro.build.date': True,
+        'net.bt.name': True,
+        'mediatek.wlan.chip': True,
+        'ro.system.build.date': True,
+        'persist.sys.timezone': True
     }
     data = ""
     for key, value in info_json.items():
         try:
             if HARDWARE_KEY[key] == True:
+                key = ' '.join(key.split('.')[1:]).title().replace(" ", "")
                 obj = key + ': ' + value + '\n'
                 print(key, value)
                 data += obj

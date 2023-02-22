@@ -49,7 +49,7 @@ export default memo(
       setStatusB(ids.map(_ => false));
       setLogs(ids.map(_=> ('')));
       setStatus(ids.map(_=> ('not-start')));
-      setReportName(infos.map(item=> (item['device_id'] + '_' + item['ro.product.odm.brand'] + '_' + item['ro.product.odm.device'] + '.pdf')));
+      setReportName(infos.map(item=> (item['device_id'] + "_" +  item['ro.product.model'] + '.pdf')));
     }, [ids, infos]);
 
 
@@ -200,8 +200,9 @@ export default memo(
           <div key={i} style={styles.device}>
             {isShowReport ? <PdfFolder type='android' rName = {reportNameShow} funcCloseReport={funcCloseReport}/> : ''}
             <div style={styles.deviceInfo}>
-              <li style={styles.info}><b>DeviceName:</b> {infos[i]['ro.product.odm.brand'] + ' ' + infos[i]['ro.product.odm.device']}</li>
-              <li style={styles.info}><b>DeviceModel:</b> {infos[i]['ro.product.odm.model']}</li>
+              <li style={styles.info}><b>DeviceSerial:</b> {infos[i]['device_id']}</li>
+              <li style={styles.info}><b>DeviceName:</b> {infos[i]['ro.product.name']}</li>
+              <li style={styles.info}><b>DeviceModel:</b> {infos[i]['ro.product.model']}</li>
               <li style={styles.info}><b>BoardType:</b> {infos[i]['ro.product.board']}</li>
               <li style={styles.info}><b>ProductVersion:</b> {infos[i]['ro.build.version.release']}</li>
               <li style={styles.info}><b>BuildDate:</b> {infos[i]['ro.build.date']}</li> 
