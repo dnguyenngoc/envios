@@ -50,7 +50,7 @@ async def get_list_device():
         _data = {}
         _data['device_id'] = device_id 
         _data['request_id']= request_id
-        _data['battery.serial_number'] = ''
+        _data['battery.technology'] = ''
         _data['battery.manufacture_date'] = ''
         _data['battery.cycle_count'] = ''
         _data['battery.max_capacity'] = ''
@@ -63,17 +63,50 @@ async def get_list_device():
             if len(_str) > 1:
                 key = _str[0]
                 key = key.replace("[", "").replace("]", "")
-                val = "".join(_str[1:])
+                if key == "wlan.mac.address":
+                    val = ":".join(_str[1:])
+                else:
+                    val = "".join(_str[1:])
                 val = val.replace('\n', '').replace("[", "").replace("]", "")
                 if val[0] == " ":
                     val = val[1:]
-                if key.startswith("ro.product."):
+                if key.startswith("ro.product.") or key.startswith("ro.vendor."):
                     _data[key] = val
                 elif key.startswith("ro.build."):
                     if key == 'ro.build.version.release':
                         _data[key] = "Android " + val
                     else:
                         _data[key] = val
+                elif key.startswith("wlan."):
+                    _data[key] = val
+                elif key.startswith("ro.serialno") \
+                    or key.startswith("persist.sys.timezone") \
+                    or key.startswith("ro.hardware") \
+                    or key.startswith('mediatek.wlan.chip'):
+                    _data[key] = val
+                elif key.startswith("ro.config.") or key.startswith("net.bt."):
+                    _data[key] = val
+
+        # Update battery info
+        try:
+            info = subprocess.Popen(["adb", "-s", "%s" %(device_id), "shell", "dumpsys", "battery"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout = info.stdout
+            for line in stdout:
+                _str = line.decode('utf-8')
+                _str = _str.split(":")
+                if _str[0].__contains__("technology"):
+                    _data['battery.technology'] = _str[1].replace("\n", "")
+                elif _str[0].__contains__("LLB CAL"):
+                    _data['battery.manufacture_date'] = _str[1].replace("\n", "")
+                elif _str[0].__contains__("mSavedBatteryMaxCurrent"):
+                    _data['battery.cycle_count'] = _str[1].replace("\n", "")
+                elif _str[0].__contains__("mSavedBatteryUsage"):
+                    _data['battery.max_capacity'] = _str[1].replace("\n", "")
+                elif _str[0].__contains__("mSavedBatteryAsoc"):
+                    _data['battery.maximum_charge_current'] = _str[1].replace("\n", "")
+        except Exception as e:
+            print(e)
+            pass
         
         save_file(config.STORAGE_DEFAULT_PATH + 'json/%s%s' %(request_id + '_' + device_id, '.json'), _data)
         
