@@ -86,7 +86,7 @@ const AndroidRestore = () => {
         <div style={styles.page}>
             <div style={styles.form}>
                 <div style={styles.titles}>
-                    <h5 style={styles.title}>List of DEVICE</h5>
+                    <h5 style={styles.title}>List of Android DEVICE</h5>
 
                     <Button disabled={getDevicesButton} onClick={funcGetDevices} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black'}}>Get Devices</Button>
                     <Button disabled={lockButtonAll} onClick={funcStopAllProcess} type="primary" shape="round" size='large' style={{boxShadow: 'rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset', color:'black', marginLeft: '20px'}}>Stop All Process</Button>
