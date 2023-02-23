@@ -36,6 +36,7 @@ const Home = () => {
             font: 'Roboto'
         }
     }
+    
     return (
     <div style={styles.homepage}>
         <div style={styles.hpContent}>
