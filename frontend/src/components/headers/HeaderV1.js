@@ -1,8 +1,23 @@
 import React from 'react';
 import Logo from '../../assets/images/logo/envios.png';
+import {  Dropdown, Space, Menu } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+
+const menu = (
+    <Menu>
+        <Menu.Item>
+            <a rel="noopener noreferrer" href="/tool/ios-restore">IOS Restore</a>
+        </Menu.Item>
+        <Menu.Item>
+            <a rel="noopener noreferrer" href="/tool/android-restore">Android Restore</a>
+        </Menu.Item>
+    </Menu>
+);
 
 
 const Header = () => {
+      
     return (
     <div style={{    
         position: 'absolute',
@@ -13,7 +28,7 @@ const Header = () => {
         right: 0,
         height: '120px',
     }}>
-        <div style={{ paddingTop: '20px', paddingLeft: '50px'}}>
+        <div style={{ paddingTop: '20px', paddingLeft: '40px'}}>
             <a style={{float: 'left'}} href='/'>
                 <img src={Logo} style={{width:'140px', boxShadow: 'rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset'}} alt=''></img>
             </a>
@@ -23,8 +38,18 @@ const Header = () => {
                     fontSize: '35px',
                     listStyleType: 'none',
                 }}>
-                    <a href='/restore'><li style={{paddingRight: '20px', color: 'black'}}>Features</li></a>
-                    <a href='/not-found'><li style={{color: 'black'}}>About Us</li></a>
+                    <Dropdown
+                        overlay={menu}
+                        trigger={['hover']}
+                    >
+                        <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                            Restores
+                            {/* <DownOutlined /> */}
+                        </Space>
+                        </a>
+                    </Dropdown>
+                    <a href='/not-found'><li style={{color: 'black', paddingLeft: "20px"}}>About Us</li></a>
                 </div>
             </div>
         </div>
