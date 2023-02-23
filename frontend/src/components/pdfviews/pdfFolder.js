@@ -21,7 +21,7 @@ const PdfFolder = ({type, rName, funcCloseReport}) => {
         <div className='carousel__wrapper'>
             <div style={{display: 'inline-flex', width: '100%'}}>
                 <p style={{marginLeft: '10px'}}>Report: {rName}</p>
-                <Button style={{float: 'right', left: '370px', backgroundColor:'#FF4136'}} type='text' onClick={funcCloseReport}>X</Button>
+                <Button style={{float: 'right', left: '45%', backgroundColor:'#FF4136'}} type='text' onClick={funcCloseReport}>X</Button>
             </div>
             <div className="carousel__container">
             <Document

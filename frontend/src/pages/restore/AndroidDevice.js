@@ -8,7 +8,6 @@ import * as apiRestoreService from '../../services/AndroidRestore';
 import PdfFolder from "../../components/pdfviews/pdfFolder";
 
 
-
 const { TextArea } = Input;
 
 
@@ -196,7 +195,7 @@ export default memo(
     return(<div>
       {ids.map((id, i) => {
         return (
-        
+    
           <div key={i} style={styles.device}>
             {isShowReport ? <PdfFolder type='android' rName = {reportNameShow} funcCloseReport={funcCloseReport}/> : ''}
             <div style={styles.deviceInfo}>
@@ -208,13 +207,20 @@ export default memo(
               <li style={styles.info}><b>BuildDate:</b> {infos[i]['ro.build.date']}</li> 
             </div>
             <div style={styles.restoreLogs}>
+              {infos[i]["ro.product.name"] == undefined ?
               <TextArea
                 placeholder="Logs of process"
                   className="custom"
-                  style={{height: 80, maxHeight: 60}}
+                  style={{height: 80, maxHeight: 60, color: "red", fontSize: 16}}
+                  value={"Pls turn on devive and enable debug mode and get devices again!"}
+              /> :
+              <TextArea
+                placeholder="Logs of process"
+                  className="custom"
+                  style={{height: 80, maxHeight: 60, color: "green"}}
                   value={logs[i]}
-              />
-             
+              /> 
+              }
               {steps[i] !== undefined ?
                 <div style={{display: 'inline-flex', height: '20px'}}>
                 <Progress style={{paddingTop: '4px'}} percent={steps[i].percent} steps={12} strokeColor={processColors[i]} />
@@ -232,7 +238,11 @@ export default memo(
                 {Status(status[i])}
                </div>
                <div style={{textAlign: 'center'}}>
+               {infos[i]["ro.product.name"] !== undefined ?
                <Button disabled={statusB[i]} onClick={()=> funcRestore(i)} type="danger" size='normal' style={styles.button}>Restore</Button>
+               : 
+               <Button disabled={true} onClick={()=> funcRestore(i)} type="danger" size='normal' style={styles.button}>Restore</Button>
+               }
                <Button onClick={()=> funcShowReport(i)} type="primary" size='normal' style={styles.button}>Report</Button>
                </div>
 

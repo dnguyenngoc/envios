@@ -67,7 +67,7 @@ def create_hardware_info(info_json):
             if HARDWARE_KEY[key] == True:
                 key = ' '.join(key.split('.')[1:]).title().replace(" ", "")
                 obj = key + ': ' + value + '\n'
-                print(key, value)
+                print("    -", key, value)
                 data += obj
         except:
             pass
