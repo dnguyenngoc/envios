@@ -6,7 +6,7 @@ This is project for handle restore Iphone.
 
 ### 1. Build libidevice lib/ python requirements/ nodejs dependency
 ```
-  sh build_debian.sh
+  sh build_debian_old.sh
 ```
 
 ### 2. Run
