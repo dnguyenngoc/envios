@@ -2,25 +2,9 @@
 
 This is project for handle restore Iphone.
 
-## How to run
-
-### 1. Build libidevice lib/ python requirements/ nodejs dependency
-```
-  sh build_debian_old.sh
-```
-
-### 2. Run
-
-```
-  sh run_debian.sh
-```
-
-### 3. Stop
-
-```
-  sh stop.sh
-```
-
+## How to Run
+- Macos: [Link to MacOS Instructions](MACOS.md)
+- Debian/Ubuntu: [Link to Linux Instructions](DEBIAN.md)
 
 ## Contact Us
 
